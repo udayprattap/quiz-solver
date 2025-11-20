@@ -344,7 +344,8 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
 
 ## License
 
-This project is for educational purposes as part of the TDS LLM Analysis challenge.
+Licensed under the MIT License. See the `LICENSE` file for details.
+You are free to use, modify, and distribute with attribution.
 
 ## Support
 
