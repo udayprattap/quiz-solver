@@ -5,11 +5,19 @@ colorFrom: blue
 colorTo: green
 sdk: docker
 pinned: false
+license: mit
 ---
 
-# TDS Quiz Solver - Automated Quiz-Solving System
+# 🧠 TDS Quiz Solver
 
-Complete automated quiz-solving system for the TDS LLM Analysis challenge. This system receives quiz challenges via webhook, scrapes JavaScript-rendered web pages, processes files (PDF, CSV, Excel), analyzes data, and submits answers automatically.
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.104.1-009688.svg)](https://fastapi.tiangolo.com)
+[![Playwright](https://img.shields.io/badge/Playwright-1.40.0-45ba4b.svg)](https://playwright.dev/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+**Automated Quiz-Solving System for TDS LLM Analysis Challenge**
+
+Intelligent webhook-based system that automatically receives quiz URLs, scrapes web pages, processes data files (PDF/CSV/Excel), analyzes questions, generates answers, and submits them—all within a 3-minute window.
 
 ## 🚀 Quick Start on Hugging Face Spaces
 
@@ -65,17 +73,19 @@ curl https://USERNAME-quiz-solver.hf.space/info
 - ⚠️ Limited to static HTML (requests-only)
 - ⚠️ May not handle complex JS-heavy pages
 
-## 📊 Features
+---
 
-- ✅ FastAPI webhook endpoint for quiz challenges
-- ✅ Playwright headless browser (Docker) or requests fallback (Python)
-- ✅ PDF, CSV, Excel file processing
-- ✅ Automated data analysis and answer generation
-- ✅ Quiz chain solving (multiple sequential quizzes)
-- ✅ Background task processing
-- ✅ Rate limiting to prevent abuse
-- ✅ Comprehensive error handling and logging
-- ✅ Chart generation for visualization questions
+## 📊 Key Features
+
+- **FastAPI Webhook**: `/solve` endpoint for quiz challenges
+- **Browser Automation**: Playwright Chromium (Docker) or requests fallback (Python)
+- **Multi-Format Processing**: PDF, CSV, Excel file support
+- **Smart Analysis**: Automated data analysis and answer generation
+- **Quiz Chains**: Handles multiple sequential quizzes
+- **Background Tasks**: Non-blocking async processing
+- **Rate Limiting**: IP-based abuse prevention
+- **Error Handling**: 3-minute timeout with retry logic
+- **Chart Generation**: Base64 PNG for visualization questions
 
 ## 🔧 Supported Question Types
 
@@ -100,14 +110,44 @@ curl https://USERNAME-quiz-solver.hf.space/info
 - `429 Too Many Requests`: Rate limit exceeded
 - `500 Internal Server Error`: Server error
 
-## 🛠️ Development
+---
 
-Full documentation, installation instructions, and development guide available in the [GitHub repository](https://github.com/udayprattap/quiz-solver).
+## 📚 Full Documentation
 
-## 📄 License
+Comprehensive installation, usage, and development guide available in the [GitHub repository](https://github.com/udayprattap/quiz-solver).
 
-MIT License - See LICENSE file for details.
+**Quick Links**:
+- 📖 [Complete README](https://github.com/udayprattap/quiz-solver/blob/main/README.md)
+- 📋 [Project Summary](https://github.com/udayprattap/quiz-solver/blob/main/PROJECT_SUMMARY.md)
+- 🧪 [Testing Guide](https://github.com/udayprattap/quiz-solver#testing)
+- 🚀 [Deployment Options](https://github.com/udayprattap/quiz-solver#deployment)
 
 ---
 
-**Built with**: FastAPI • Playwright • pandas • pdfplumber • matplotlib
+## 📄 License
+
+MIT License - See [LICENSE](https://github.com/udayprattap/quiz-solver/blob/main/LICENSE) file for details.
+
+---
+
+## 🛠️ Built With
+
+**Core**: FastAPI • Python 3.10 • Playwright • Docker
+
+**Data**: pandas • pdfplumber • openpyxl • BeautifulSoup4
+
+**Viz**: matplotlib • seaborn
+
+**More**: [Full Tech Stack](https://github.com/udayprattap/quiz-solver#tech-stack)
+
+---
+
+## 📞 Contact
+
+**GitHub**: [udayprattap/quiz-solver](https://github.com/udayprattap/quiz-solver)
+
+**Email**: 24ds3000019@ds.study.iitm.ac.in
+
+---
+
+**Status**: ✅ Production Ready | 🚀 Live on Hugging Face Spaces
