@@ -8,7 +8,7 @@
 
 **Automated Quiz-Solving System for TDS LLM Analysis Challenge**
 
-An intelligent webhook-based system that automatically receives quiz URLs, scrapes web pages with Playwright, processes data files (PDF/CSV/Excel), analyzes questions using keyword detection and data science techniques, generates accurate answers, and submits them—all within a 3-minute timeout window.
+An intelligent webhook-based system that automatically receives quiz URLs, scrapes web pages with Playwright, processes data files (PDF/CSV/Excel), analyzes questions using **GPT-4 LLM** with rule-based fallbacks, generates accurate answers, and submits them—all within a 3-minute timeout window.
 
 ---
 
@@ -39,7 +39,8 @@ An intelligent webhook-based system that automatically receives quiz URLs, scrap
   - PDF table extraction (pdfplumber)
   - CSV/Excel loading and cleaning (pandas)
   - HTML table parsing (BeautifulSoup4)
-- **Smart Question Analysis**: Keyword detection for operations (sum, count, average, max, min, filter)
+- **LLM-Powered Analysis**: OpenAI GPT-4 integration for complex question parsing with PIPE_TOKEN
+- **Smart Question Analysis**: LLM-first approach with rule-based fallback (keyword detection for sum, count, average, max, min, filter)
 - **Automatic Answer Generation**:
   - Numeric answers (int, float)
   - Boolean answers (true/false)
@@ -55,7 +56,7 @@ An intelligent webhook-based system that automatically receives quiz URLs, scrap
 - **Health Monitoring**: `/` health check and `/info` diagnostics endpoints
 - **Environment-Based Configuration**: Support for multiple deployment modes
 - **Playwright Fallback**: Optional requests-only mode for restricted environments
-- **Self-Ping**: Optional background task to prevent cold starts
+- **Keep-Alive Mechanism**: Self-ping every 10 minutes to prevent service sleep on free tier hosting
 - **Comprehensive Logging**: Detailed execution traces for debugging
 
 ---
@@ -67,6 +68,7 @@ An intelligent webhook-based system that automatically receives quiz URLs, scrap
 | **Backend** | Python | 3.10+ | Core runtime |
 | **Web Framework** | FastAPI | 0.104.1 | API endpoints |
 | **ASGI Server** | Uvicorn | 0.24.0 | Production server |
+| **LLM** | OpenAI | 1.54.0 | GPT-4 integration |
 | **Browser Automation** | Playwright | 1.40.0 | JavaScript rendering |
 | **Data Processing** | pandas | 2.1.3 | Data manipulation |
 | **PDF Parsing** | pdfplumber | 0.10.3 | Table extraction |
@@ -75,7 +77,7 @@ An intelligent webhook-based system that automatically receives quiz URLs, scrap
 | **Visualization** | matplotlib | 3.8.2 | Chart generation |
 | **Visualization** | seaborn | 0.13.0 | Statistical plots |
 | **HTTP Client** | requests | 2.31.0 | Answer submission |
-| **Async HTTP** | aiohttp | 3.9.5 | Self-ping task |
+| **Async HTTP** | httpx | 0.27.0 | Keep-alive pings |
 | **Containerization** | Docker | - | Deployment |
 | **Environment Config** | python-dotenv | 1.0.0 | .env support |
 
@@ -156,11 +158,12 @@ EMAIL=your.email@example.com
 SECRET=your_secret_key
 
 # Optional
-PIPE_TOKEN=your_optional_api_token
+PIPE_TOKEN=your_openai_compatible_token
 DISABLE_PLAYWRIGHT=0
+PORT=7860
 RATE_LIMIT_WINDOW=300
 RATE_LIMIT_MAX=40
-ENABLE_SELF_PING=0
+ENABLE_KEEP_ALIVE=1
 ```
 
 ---
@@ -173,11 +176,12 @@ ENABLE_SELF_PING=0
 |----------|----------|---------|-------------|
 | `EMAIL` | ✅ Yes | - | Your registered email address for authentication |
 | `SECRET` | ✅ Yes | - | Secret key for request authorization |
-| `PIPE_TOKEN` | ❌ No | - | External API bearer token (never logged) |
+| `PIPE_TOKEN` | ❌ No | - | OpenAI-compatible API token for GPT-4 LLM (used as OpenAI API key) |
+| `PORT` | ❌ No | `7860` | Server port (standard for Render.com and HF Spaces) |
 | `DISABLE_PLAYWRIGHT` | ❌ No | `0` | Set to `1` for requests-only fallback mode |
 | `RATE_LIMIT_WINDOW` | ❌ No | `300` | Rate limit time window (seconds) |
 | `RATE_LIMIT_MAX` | ❌ No | `40` | Max requests per IP per window |
-| `ENABLE_SELF_PING` | ❌ No | `0` | Background self-ping to prevent cold starts |
+| `ENABLE_KEEP_ALIVE` | ❌ No | `1` | Self-ping every 10 minutes to prevent service sleep (Render free tier) |
 
 ### Configuration Scenarios
 
@@ -213,13 +217,13 @@ DISABLE_PLAYWRIGHT=1
 #### Development Mode (with auto-reload)
 
 ```bash
-uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+uvicorn main:app --host 0.0.0.0 --port 7860 --reload
 ```
 
 #### Production Mode
 
 ```bash
-uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
+uvicorn main:app --host 0.0.0.0 --port 7860 --workers 4
 ```
 
 #### Direct Python Execution
@@ -228,14 +232,14 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
 python main.py
 ```
 
-The server will start at `http://localhost:8000`
+The server will start at `http://localhost:7860`
 
 ### Making Requests
 
 #### Health Check
 
 ```bash
-curl http://localhost:8000/
+curl http://localhost:7860/
 ```
 
 **Expected Response:**
@@ -254,13 +258,13 @@ curl http://localhost:8000/
 #### System Information
 
 ```bash
-curl http://localhost:8000/info
+curl http://localhost:7860/info
 ```
 
 #### Solve a Quiz
 
 ```bash
-curl -X POST http://localhost:8000/solve \
+curl -X POST http://localhost:7860/solve \
   -H "Content-Type: application/json" \
   -d '{
     "email": "your.email@example.com",
@@ -394,17 +398,17 @@ Submit a quiz URL for automated solving.
 #### 1. Start the Server
 
 ```bash
-uvicorn main:app --host 0.0.0.0 --port 8000
+uvicorn main:app --host 0.0.0.0 --port 7860
 ```
 
 #### 2. Run Test Commands
 
 ```bash
 # Test health check
-curl http://localhost:8000/
+curl http://localhost:7860/
 
 # Test valid request
-curl -X POST http://localhost:8000/solve \
+curl -X POST http://localhost:7860/solve \
   -H "Content-Type: application/json" \
   -d '{
     "email": "your.email@example.com",
@@ -413,7 +417,7 @@ curl -X POST http://localhost:8000/solve \
   }'
 
 # Test invalid secret (should fail)
-curl -X POST http://localhost:8000/solve \
+curl -X POST http://localhost:7860/solve \
   -H "Content-Type: application/json" \
   -d '{
     "email": "your.email@example.com",
@@ -464,68 +468,100 @@ docker build -t tds-quiz-solver .
 
 ```bash
 docker run -d \
-  -p 8000:8000 \
+  -p 7860:7860 \
   -e EMAIL=your.email@example.com \
   -e SECRET=your_secret \
+  -e PORT=7860 \
   tds-quiz-solver
 ```
 
 #### Test the Container
 
 ```bash
-curl http://localhost:8000/
+curl http://localhost:7860/
 ```
 
 ---
 
-### Hugging Face Spaces
+### Render.com (Current Production)
 
-**Live Deployment:** https://huggingface.co/spaces/udaypratap/quiz-solver
+**Live Deployment:** https://quiz-solver-15k6.onrender.com/solve
 
 #### Setup Steps
 
-1. **Create a Space**
-   - Go to https://huggingface.co/spaces
-   - Click "New Space"
-   - Choose SDK: "Docker"
-   - Name: `quiz-solver`
+1. **Push to GitHub**
+   ```bash
+   git push origin main
+   ```
 
-2. **Upload Files**
-   - Upload all project files (see [Project Structure](#-project-structure))
-   - Use `README_HF.md` as the Space README
+2. **Create New Web Service**
+   - Go to https://render.com/dashboard
+   - Click "New +" → "Blueprint"
+   - Connect your GitHub repository
+   - Select repository: `quiz-solver`
 
-3. **Configure Environment Variables**
-   - Go to Space Settings → Variables & Secrets
-   - Add:
-     - `EMAIL` = your.email@example.com
-     - `SECRET` = your_secret_key
-     - `DISABLE_PLAYWRIGHT` = 0 (for Docker)
-     - `RATE_LIMIT_WINDOW` = 300
-     - `RATE_LIMIT_MAX` = 40
+3. **Configure via render.yaml**
+   - Render automatically detects `render.yaml`
+   - Service name: `tds-quiz-solver`
+   - Environment: Docker
+   - Region: Singapore (or nearest)
+   - Plan: Free
 
-4. **Wait for Build** (2-5 minutes)
-   - Docker container builds automatically
-   - Monitor build logs for errors
+4. **Add Environment Variables Manually** ⚠️
+   - **Important**: `render.yaml` env vars only apply at creation, not updates
+   - Go to Dashboard → Your Service → Environment
+   - Add manually:
+     - `EMAIL` = 24ds3000019@ds.study.iitm.ac.in
+     - `SECRET` = banana
+     - `PIPE_TOKEN` = (your OpenAI-compatible token)
+     - `PORT` = 7860
+     - `ENABLE_KEEP_ALIVE` = 1
+     - `DISABLE_PLAYWRIGHT` = 0
 
-5. **Test Deployment**
-```bash
-curl https://USERNAME-quiz-solver.hf.space/
-```
+5. **Deploy**
+   - Click "Manual Deploy" → "Deploy latest commit"
+   - Build takes ~5-10 minutes
+   - Monitor logs for "✓ Keep-alive ping successful"
+
+6. **Test Deployment**
+   ```bash
+   # Health check
+   curl https://quiz-solver-15k6.onrender.com/
+   
+   # Test solve endpoint
+   curl -X POST https://quiz-solver-15k6.onrender.com/solve \
+     -H "Content-Type: application/json" \
+     -d '{
+       "email": "24ds3000019@ds.study.iitm.ac.in",
+       "secret": "banana",
+       "url": "https://tds-llm-analysis.s-anand.net/demo"
+     }'
+   ```
+
+#### Keep-Alive Configuration
+
+**Important for Free Tier**: Render free tier sleeps after 15 minutes of inactivity.
+
+The app includes automatic keep-alive:
+- Self-pings every 10 minutes
+- Controlled by `ENABLE_KEEP_ALIVE=1`
+- Prevents cold starts during evaluation
+- Monitor logs: `"✓ Keep-alive ping successful"`
+
+**Optional External Monitoring**: Use [UptimeRobot](https://uptimerobot.com) (free) to ping every 5 minutes
 
 ---
 
-### Render
+### Hugging Face Spaces (Alternative)
 
-1. **Push to GitHub** (already done)
-2. **Connect Repository**
-   - Go to https://render.com
-   - New → Blueprint
-   - Select your repository
-3. **Configure**
-   - Uses `render.yaml` for configuration
-   - Add environment variables in Render dashboard
-4. **Deploy**
-   - Automatic deployment from main branch
+**Note**: HF Spaces has Docker layer caching issues. Use Render.com for production.
+
+#### Quick Setup
+
+1. Create Space at https://huggingface.co/spaces
+2. Upload all files, use Docker SDK
+3. Add env vars in Settings → Variables & Secrets
+4. Use "Factory Reboot" to clear Docker cache if needed
 
 ---
 
@@ -541,6 +577,24 @@ See detailed instructions in `PROJECT_SUMMARY.md` for:
 ## 🔧 Troubleshooting
 
 ### Common Issues
+
+#### Port Already in Use
+
+**Check if port 7860 is in use:**
+```bash
+# macOS/Linux
+lsof -i :7860
+
+# Windows
+netstat -ano | findstr :7860
+```
+
+**Use a different port:**
+```bash
+PORT=8000 uvicorn main:app --port 8000
+```
+
+---
 
 #### "playwright not found"
 
@@ -566,21 +620,18 @@ EMAIL=your.email@example.com
 SECRET=your_secret_key
 ```
 
-#### Server Not Responding
+#### Keep-Alive Not Working
 
-**Check if port 8000 is in use:**
-```bash
-# macOS/Linux
-lsof -i :8000
-
-# Windows
-netstat -ano | findstr :8000
+**Check logs for:**
+```
+✓ Keep-alive ping successful
 ```
 
-**Kill the process or use a different port:**
-```bash
-uvicorn main:app --port 8001
-```
+**If missing:**
+- Verify `ENABLE_KEEP_ALIVE=1` in environment
+- Check `httpx` is installed: `pip install httpx==0.27.0`
+- Ensure PORT is correctly set (7860)
+- Review logs for "Keep-alive ping failed" errors
 
 #### Quiz Times Out
 
@@ -620,22 +671,24 @@ Should use `jammy` (Python 3.10+), not `focal` (Python 3.8)
 
 ```
 quiz-solver/
-├── app.py                  # Hugging Face Space entrypoint
-├── main.py                 # FastAPI application & endpoints
-├── quiz_solver.py          # Core quiz-solving logic
+├── main.py                 # FastAPI application & endpoints (keep-alive included)
+├── quiz_solver.py          # Core quiz-solving logic (LLM + rule-based)
+├── llm_helper.py           # OpenAI GPT-4 integration for complex questions
 ├── config.py               # Environment variable configuration
-├── requirements.txt        # Python dependencies
-├── Dockerfile              # Docker container configuration
+├── requirements.txt        # Python dependencies (includes openai, httpx)
+├── Dockerfile              # Docker container for Render.com (port 7860)
+├── start.sh                # Startup script with diagnostics
+├── render.yaml             # Render.com deployment configuration
 ├── .dockerignore           # Docker build exclusions
 ├── .env.example            # Environment template
 ├── .gitignore              # Git exclusions
-├── README.md               # This file
-├── README_HF.md            # Hugging Face Space README
-├── PROJECT_SUMMARY.md      # Project overview & testing guide
-├── test_production.sh      # Production test script
-├── render.yaml             # Render deployment config
+├── README.md               # This file (comprehensive documentation)
+├── DEPLOYMENT_FAQ.md       # Deployment troubleshooting guide
+├── EVALUATION_REPORT.md    # Testing results and capabilities
+├── LLM_INTEGRATION.md      # LLM integration documentation
+├── RENDER_SETUP_URGENT.md  # Render.com setup guide
 ├── LICENSE                 # MIT License
-└── utils/                  # Utility modules
+└── utils/                  # Utility modules (optional, for extended features)
     ├── __init__.py
     ├── pdf_processor.py    # PDF table extraction
     ├── csv_processor.py    # CSV/Excel data loading
@@ -645,10 +698,12 @@ quiz-solver/
 
 ### Key Files
 
-- **`main.py`**: FastAPI app, endpoints, background tasks, middleware
-- **`quiz_solver.py`**: Quiz chain solving, question analysis, answer generation
-- **`config.py`**: Credential validation, environment loading
-- **`utils/`**: Modular utility functions for file processing and analysis
+- **`main.py`**: FastAPI app, endpoints, background tasks, keep-alive mechanism, rate limiting
+- **`quiz_solver.py`**: Quiz chain solving, LLM integration, rule-based fallback, answer generation
+- **`llm_helper.py`**: OpenAI GPT-4 client for complex question parsing using PIPE_TOKEN
+- **`config.py`**: Credential validation, environment loading, PIPE_TOKEN management
+- **`start.sh`**: Diagnostic startup script checking all environment variables
+- **`utils/`**: Optional modular utility functions for file processing and analysis
 
 ---
 
@@ -690,7 +745,7 @@ See the [LICENSE](LICENSE) file for full details.
 
 **GitHub Repository**: https://github.com/udayprattap/quiz-solver
 
-**Hugging Face Space**: https://huggingface.co/spaces/udaypratap/quiz-solver
+**Live Endpoint**: https://quiz-solver-15k6.onrender.com/solve
 
 **Email**: 24ds3000019@ds.study.iitm.ac.in
 
