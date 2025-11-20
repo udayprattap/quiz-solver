@@ -1,151 +1,43 @@
+---
+title: TDS Quiz Solver
+emoji: 🧠
+colorFrom: blue
+colorTo: green
+sdk: docker
+pinned: false
+---
+
 # TDS Quiz Solver - Automated Quiz-Solving System
 
-Complete automated quiz-solving system for the TDS LLM Analysis challenge. This system receives quiz challenges via webhook, scrapes JavaScript-rendered web pages, processes files (PDF, CSV, Excel), analyzes data, and submits answers automatically within 3 minutes.
+Complete automated quiz-solving system for the TDS LLM Analysis challenge. This system receives quiz challenges via webhook, scrapes JavaScript-rendered web pages, processes files (PDF, CSV, Excel), analyzes data, and submits answers automatically.
 
-## Features
+## 🚀 Quick Start on Hugging Face Spaces
 
-- ✅ FastAPI webhook endpoint for receiving quiz challenges
-- ✅ Playwright headless browser for JavaScript-rendered pages
-- ✅ PDF table extraction with pdfplumber
-- ✅ CSV and Excel file processing with pandas
-- ✅ Automated data analysis and answer generation
-- ✅ Quiz chain solving (multiple quizzes in sequence)
-- ✅ Background task processing
-- ✅ Comprehensive error handling and logging
-- ✅ Base64 content decoding
-- ✅ Chart generation for visualization questions
-- ✅ 3-minute timeout per quiz with retry logic
+This Space provides a `/solve` endpoint that accepts quiz URLs and automatically solves them.
 
-## Project Structure
+### Required Environment Variables
 
-```
-tds-quiz-solver/
-├── .env                    # Environment variables (EMAIL, SECRET)
-├── .gitignore              # Git ignore file
-├── main.py                 # FastAPI application with /solve endpoint
-├── quiz_solver.py          # Core quiz-solving logic
-├── requirements.txt        # Python dependencies
-├── test_endpoint.py        # Testing script
-├── utils/                  # Utility modules
-│   ├── __init__.py
-│   ├── pdf_processor.py    # PDF extraction
-│   ├── csv_processor.py    # CSV/Excel handling
-│   ├── web_scraper.py      # Web page scraping
-│   └── data_analyzer.py    # Data processing
-├── downloads/              # Temporary file storage
-└── README.md              # This file
-```
+Configure these in your Space Settings → Variables & Secrets:
 
-## Requirements
+| Variable | Required | Example | Description |
+|----------|----------|---------|-------------|
+| `EMAIL` | ✅ Yes | `your.email@example.com` | Your registered email |
+| `SECRET` | ✅ Yes | `your_secret_key` | Your authentication secret |
+| `DISABLE_PLAYWRIGHT` | Optional | `0` | Set to `1` for Python Space (requests-only mode) |
+| `RATE_LIMIT_WINDOW` | Optional | `300` | Rate limit window in seconds |
+| `RATE_LIMIT_MAX` | Optional | `40` | Max requests per IP per window |
+| `ENABLE_SELF_PING` | Optional | `0` | Set to `1` to keep Space awake |
 
-- Python 3.10 or higher
-- Internet connection for downloading files and submitting answers
-- macOS, Linux, or Windows
+### API Endpoints
 
-## Installation
-
-### 1. Clone or Download the Project
-
+#### Health Check
 ```bash
-cd tds-quiz-solver
+curl https://USERNAME-quiz-solver.hf.space/
 ```
 
-### 2. Create Virtual Environment (Recommended)
-
+#### Solve Quiz
 ```bash
-python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-
-### 3. Install Python Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Install Playwright Browsers
-
-```bash
-playwright install chromium
-```
-
-This downloads the Chromium browser needed for web scraping.
-
-### 5. Create Environment File
-
-Create a `.env` file in the project root with your credentials:
-
-```bash
-EMAIL=your.email@example.com
-SECRET=your_secret_key_here
-# Optional external API token (leave blank if not needed)
-PIPE_TOKEN=your_pipe_token_here
-# Optional runtime behavior flags
-DISABLE_PLAYWRIGHT=0            # Set to 1 to use requests-only fallback
-RATE_LIMIT_WINDOW=300           # Seconds per rate limit window
-RATE_LIMIT_MAX=40               # Max requests per IP per window
-ENABLE_SELF_PING=0              # Set to 1 to enable periodic self ping (requires aiohttp)
-```
-
-**Important:** Replace the values with your actual email and secret key. Leave `PIPE_TOKEN` only if you need authenticated outbound API calls; otherwise omit it.
-
-The file `.env.example` contains a template. Never commit a real `PIPE_TOKEN`. It is treated like a password.
-
-### Environment Variable Reference
-
-| Variable | Required | Default | Purpose |
-| -------- | -------- | ------- | ------- |
-| `EMAIL` | Yes | – | Auth email matched on requests |
-| `SECRET` | Yes | – | Shared secret key to authorize `/solve` |
-| `PIPE_TOKEN` | No | – | External API bearer token (never logged) |
-| `DISABLE_PLAYWRIGHT` | No | `0` | Fallback to requests-only mode if Playwright/headless browser unavailable |
-| `RATE_LIMIT_WINDOW` | No | `300` | Rate limiting window (seconds) |
-| `RATE_LIMIT_MAX` | No | `40` | Max requests per IP per window |
-| `ENABLE_SELF_PING` | No | `0` | Keep-alive background ping (set `1` on hosts that sleep) |
-
-If deploying to a restricted environment (e.g. Hugging Face Python Space without Chromium), set `DISABLE_PLAYWRIGHT=1` to avoid browser startup errors.
-
-## Usage
-
-### Starting the Server
-
-```bash
-uvicorn main:app --host 0.0.0.0 --port 8000
-```
-
-Or run directly:
-
-```bash
-python main.py
-```
-
-The server will start on `http://localhost:8000`
-
-### Testing the Endpoint
-
-In a new terminal, run the test script:
-
-```bash
-python test_endpoint.py
-```
-
-This will run several tests:
-1. ✅ Health check (`GET /`)
-2. ✅ Valid request with demo URL
-3. ✅ Invalid secret (should return 403)
-4. ✅ Invalid JSON payload (should return 422)
-5. ✅ Optional custom URL test
-
-### Manual Testing with curl
-
-Health check:
-```bash
-curl http://localhost:8000/
-```
-
-Submit a quiz:
-```bash
-curl -X POST http://localhost:8000/solve \
+curl -X POST https://USERNAME-quiz-solver.hf.space/solve \
   -H "Content-Type: application/json" \
   -d '{
     "email": "your.email@example.com",
@@ -154,375 +46,68 @@ curl -X POST http://localhost:8000/solve \
   }'
 ```
 
-## API Endpoints
-
-### GET /
-
-Health check endpoint.
-
-**Response:**
-```json
-{
-  "status": "ready",
-  "service": "TDS Quiz Solver",
-  "version": "1.0.0",
-  "timestamp": "2025-11-20T10:30:00.000000"
-}
+#### System Info
+```bash
+curl https://USERNAME-quiz-solver.hf.space/info
 ```
 
-### POST /solve
+## 🐳 Docker vs Python Space
 
-Webhook endpoint to receive and solve quiz challenges.
+### Docker Space (Recommended)
+- ✅ Full Playwright browser support
+- ✅ Complete JavaScript rendering
+- ✅ Handles dynamic content
+- ⚠️ Slightly longer startup time
 
-**Request Body:**
-```json
-{
-  "email": "your.email@example.com",
-  "secret": "your_secret_key",
-  "url": "https://quiz-url.com/start"
-}
-```
+### Python Space
+- ✅ Faster startup
+- ⚠️ Set `DISABLE_PLAYWRIGHT=1`
+- ⚠️ Limited to static HTML (requests-only)
+- ⚠️ May not handle complex JS-heavy pages
 
-**Response (200 OK):**
-```json
-{
-  "status": "processing",
-  "message": "Quiz solving started for URL: https://quiz-url.com/start"
-}
-```
+## 📊 Features
 
-**Error Responses:**
-- `403 Forbidden`: Invalid secret or email mismatch
-- `422 Unprocessable Entity`: Invalid request payload
-- `500 Internal Server Error`: Server error
+- ✅ FastAPI webhook endpoint for quiz challenges
+- ✅ Playwright headless browser (Docker) or requests fallback (Python)
+- ✅ PDF, CSV, Excel file processing
+- ✅ Automated data analysis and answer generation
+- ✅ Quiz chain solving (multiple sequential quizzes)
+- ✅ Background task processing
+- ✅ Rate limiting to prevent abuse
+- ✅ Comprehensive error handling and logging
+- ✅ Chart generation for visualization questions
 
-## How It Works
-
-1. **Webhook Receives Request**: FastAPI endpoint receives quiz URL and credentials
-2. **Background Task Starts**: Quiz solving runs asynchronously to return immediate response
-3. **Browser Automation**: Playwright opens the quiz page and waits for content to load
-4. **Content Extraction**: Extracts HTML and text, decodes Base64 if present
-5. **File Processing**: Downloads and processes PDF, CSV, or Excel files
-6. **Data Analysis**: Analyzes data based on question keywords (sum, count, average, etc.)
-7. **Answer Generation**: Generates appropriate answer type (int, float, bool, dict, or chart)
-8. **Answer Submission**: Posts answer to submit endpoint with retry logic
-9. **Chain Handling**: If next URL is provided, continues to next quiz
-10. **Completion**: Logs results when chain is complete or timeout occurs
-
-## Supported Question Types
+## 🔧 Supported Question Types
 
 - **Numeric**: Sum, total, count, average, mean, median, max, min
 - **Boolean**: True/false, yes/no questions
-- **Charts**: Bar charts, line plots, scatter plots, histograms (returned as Base64 PNG)
+- **Charts**: Bar charts, line plots, scatter plots, histograms (Base64 PNG)
 - **Complex**: JSON objects with multiple values
 
-## Answer Detection Logic
+## 📝 Response Format
 
-The system analyzes question text to determine the appropriate answer:
-
-- Keywords like "sum", "total" → Calculate sum of numeric column
-- Keywords like "count", "how many" → Count rows (with optional filtering)
-- Keywords like "mean", "average" → Calculate mean
-- Keywords like "max", "highest" → Find maximum value
-- Keywords like "min", "lowest" → Find minimum value
-- Keywords like "chart", "plot" → Generate visualization as Base64 PNG
-- Keywords like "true/false", "yes/no" → Return boolean
-
-## File Support
-
-- **PDF**: Extracts tables using pdfplumber, supports multi-page PDFs
-- **CSV**: Loads directly from URL into pandas DataFrame
-- **Excel**: Supports .xlsx and .xls formats
-- **HTML Tables**: Parses tables from web pages
-
-## Logging
-
-The application logs all activities:
-
-- Incoming requests and authentication
-- Page loading and content extraction
-- File downloads and processing
-- Data analysis operations
-- Answer generation and submission
-- Quiz chain progress
-- Errors and exceptions
-
-Logs are printed to console with timestamps.
-
-## Error Handling
-
-- **Timeouts**: 3-minute limit per quiz
-- **Network Errors**: Retry logic with 3 attempts
-- **Invalid Data**: Graceful fallback to default answers
-- **Missing Files**: Error logging and chain termination
-- **Authentication**: Immediate rejection of invalid credentials
-
-## Troubleshooting
-
-### Issue: "playwright not found"
-```bash
-pip install playwright
-playwright install chromium
+### Success Response (202 Accepted)
+```json
+{
+  "status": "processing",
+  "message": "Quiz solving started for URL: https://example.com/quiz"
+}
 ```
 
-### Issue: "ModuleNotFoundError: No module named 'pdfplumber'"
-```bash
-pip install -r requirements.txt
-```
+### Error Responses
+- `403 Forbidden`: Invalid secret or email mismatch
+- `422 Unprocessable Entity`: Invalid request format
+- `429 Too Many Requests`: Rate limit exceeded
+- `500 Internal Server Error`: Server error
 
-### Issue: "EMAIL or SECRET not set"
-Create a `.env` file with:
-```
-EMAIL=your.email@example.com
-SECRET=your_secret_key
-```
+## 🛠️ Development
 
-### Issue: Server not responding
-Check if port 8000 is available:
-```bash
-lsof -i :8000  # On macOS/Linux
-netstat -ano | findstr :8000  # On Windows
-```
+Full documentation, installation instructions, and development guide available in the [GitHub repository](https://github.com/udayprattap/quiz-solver).
 
-### Issue: Quiz times out
-- Check internet connection
-- Verify the quiz URL is accessible
-- Check logs for specific errors
-- Increase timeout in `quiz_solver.py` if needed
+## 📄 License
 
-## Development
-
-### Adding New Analysis Functions
-
-Add functions to `utils/data_analyzer.py`:
-
-```python
-def my_custom_analysis(df: pd.DataFrame, column: str) -> Any:
-    """Your custom analysis logic"""
-    result = df[column].my_operation()
-    return result
-```
-
-Then use in `quiz_solver.py` in the `determine_answer` method.
-
-### Adding New File Processors
-
-Add processors to respective files in `utils/`:
-
-```python
-def process_new_format(url: str) -> pd.DataFrame:
-    """Process new file format"""
-    # Your processing logic
-    return dataframe
-```
-
-## Performance
-
-- Average quiz solving time: 30-60 seconds
-- Timeout per quiz: 180 seconds (3 minutes)
-- Maximum answer size: 1MB (per quiz requirements)
-- Concurrent quizzes: Background tasks allow multiple simultaneous requests
-
-## Security
-
-- Environment variables for sensitive data (`EMAIL`, `SECRET`, optional `PIPE_TOKEN`)
-- Secret key validation on all requests
-- Email matching verification
-- Token redaction: application logs only whether `PIPE_TOKEN` is set, never the full value
-- No credentials or raw tokens in responses
-- HTTPS support for production deployment
-
-### Using PIPE_TOKEN (Optional)
-
-If you need to call an external API requiring bearer authentication:
-
-```python
-from config import get_pipe_token
-token = get_pipe_token()
-if token:
-  headers = {"Authorization": f"Bearer {token}", "Accept": "application/json"}
-```
-
-If `PIPE_TOKEN` is absent, code should gracefully skip authenticated requests.
-
-## Production Deployment
-
-For production, consider:
-
-1. Use a production ASGI server (uvicorn with workers)
-2. Set up HTTPS with SSL certificates
-3. Use environment variables or secrets management
-4. Configure logging to files or log aggregation service
-5. Set up monitoring and alerting
-6. Use a process manager (systemd, supervisor, or Docker)
-
-Example production command:
-```bash
-uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
-```
-
-### Docker Deployment
-
-Build and run locally:
-```bash
-docker build -t tds-quiz-solver .
-docker run -p 8000:8000 --env EMAIL=24ds3000019@ds.study.iitm.ac.in --env SECRET=banana tds-quiz-solver
-```
-Test:
-```bash
-curl http://localhost:8000/
-```
-
-### Render (Managed Hosting)
-
-1. Push repository (already done). Make repo public.
-2. In Render dashboard: New ➜ "Blueprint" ➜ select repo.
-3. Render auto-detects `render.yaml`. Adjust EMAIL/SECRET in dashboard if needed.
-4. Deploy; after build, note the public URL: `https://tds-quiz-solver.onrender.com/solve` (example).
-5. Confirm health:
-```bash
-curl https://<render_url>/
-```
-
-### Railway / Fly.io / Cloud Run (Alternatives)
-
-Cloud Run quick deploy:
-```bash
-gcloud builds submit --tag gcr.io/PROJECT_ID/tds-quiz-solver
-gcloud run deploy tds-quiz-solver --image gcr.io/PROJECT_ID/tds-quiz-solver --region=asia-south1 --platform=managed --allow-unauthenticated
-```
-
-Fly.io quick start:
-```bash
-fly launch --no-deploy
-fly deploy
-```
-
-Railway:
-1. Create project ➜ Add service ➜ GitHub repo.
-2. Set variables EMAIL / SECRET.
-3. Deploy.
-
-### Keep Service Awake During Evaluation
-
-Choose any provider without sleep (Render free may sleep after inactivity; wake before window). For guaranteed uptime use: Cloud Run, Fly.io, Railway.
-
-Recommended timeline (IST):
-| Time (IST) | Action |
-| ---------- | ------ |
-| 14:30      | Trigger deployment / wake service |
-| 14:45      | Manual health check & test POST /solve |
-| 14:55      | Provide endpoint URL to evaluation system |
-| 15:00–16:00| Monitoring only; keep logs open |
-
-Monitoring command:
-```bash
-watch -n 30 curl -s https://<your_public_url>/ | jq .status
-```
-
-If failure detected, redeploy or restart container; endpoint should resume quickly.
-
-### Public Exposure (ngrok)
-
-For the evaluation window (Sat 29 Nov 2025 15:00–16:00 IST):
-
-1. Install dependency:
-```bash
-pip install pyngrok
-```
-2. (Optional) Set authtoken for stable tunnels:
-```bash
-ngrok config add-authtoken <YOUR_TOKEN>
-```
-3. Use helper script:
-```bash
-python run_with_ngrok.py --port 8000
-```
-4. Note printed `Solve Endpoint` URL and submit that.
-
-Start at ~14:45 IST to ensure tunnel readiness. Free ngrok session (≈2h) covers the 1h evaluation window.
-
-If tunnel drops:
-```bash
-Ctrl+C
-python run_with_ngrok.py --port 8000
-```
-
-To use a reserved domain (paid): set `--authtoken` or configure ngrok dashboard then run script.
-
-### Hugging Face Spaces Deployment
-
-Two approaches:
-
-1. Python Space (simpler, may have Playwright limits)
-  - Create a new Space: "New Space" ➜ choose SDK = "Python"
-  - Add files from repo (`app.py`, `requirements.txt`, source files)
-  - Set environment variables in Space settings:
-    - `EMAIL=24ds3000019@ds.study.iitm.ac.in`
-    - `SECRET=banana`
-    - `DISABLE_PLAYWRIGHT=1` (recommended for Python Space unless you add system packages)
-    - Optional: `RATE_LIMIT_WINDOW`, `RATE_LIMIT_MAX`, `ENABLE_SELF_PING=1`
-  - Optional: `PORT=7860` (Spaces default). Uvicorn in `main.py` is only used when run as script; Spaces launches `app` automatically.
-  - Test: `https://<space-username>-<space-name>.hf.space/` and `/solve`.
-
-  Playwright note: The base Python Space might miss OS packages (fonts, sandbox libs). If page scraping fails, switch to Docker.
-  Fallback mode (`DISABLE_PLAYWRIGHT=1`) uses `requests` for HTML; dynamic JS content may not fully render, but simple quizzes still work.
-
-2. Docker Space (full control, Playwright browsers)
-  - Choose SDK = "Docker" when creating Space.
-  - Use the provided `Dockerfile` directly.
-  - Ensure Dockerfile includes `playwright install --with-deps chromium` (already present).
-  - Set env vars via Space Secrets panel.
-
-Keep Alive: Spaces remain generally available; however heavy scraping may exceed CPU limits on free tier. For evaluation hour your traffic is minimal.
-
-#### Troubleshooting on Spaces
-| Symptom | Likely Cause | Fix |
-| ------- | ------------ | ---- |
-| 502 Bad Gateway | Build still starting | Wait or check build logs |
-| Timeout solving quiz | Chromium missing deps | Use Docker Space or add apt packages |
-| Import error (playwright) | Missing install | Ensure requirements and Docker build step |
-| Cannot reach /solve | Wrong path or Space not running | Check logs; confirm FastAPI `app` imported in `app.py` |
-
-#### Minimal apt additions (if customizing Docker Space further)
-```Dockerfile
-RUN apt-get update && apt-get install -y libnss3 libasound2 && rm -rf /var/lib/apt/lists/*
-```
-
-After deployment, your public endpoint example:
-```
-https://<space-username>-tds-quiz-solver.hf.space/solve
-```
-Test quickly:
-```bash
-curl -X POST https://<space-username>-tds-quiz-solver.hf.space/solve \
-  -H 'Content-Type: application/json' \
-  -d '{"email":"24ds3000019@ds.study.iitm.ac.in","secret":"banana","url":"https://tds-llm-analysis.s-anand.net/demo"}'
-```
-
-## License
-
-Licensed under the MIT License. See the `LICENSE` file for details.
-You are free to use, modify, and distribute with attribution.
-
-## Support
-
-For issues or questions:
-1. Check the logs for detailed error messages
-2. Verify all dependencies are installed correctly
-3. Ensure `.env` file is configured properly
-4. Test with the demo URL first: `https://tds-llm-analysis.s-anand.net/demo`
-
-## Credits
-
-Built with:
-- FastAPI
-- Playwright
-- pandas
-- pdfplumber
-- matplotlib
-- seaborn
+MIT License - See LICENSE file for details.
 
 ---
 
-**Happy Quiz Solving! 🚀**
+**Built with**: FastAPI • Playwright • pandas • pdfplumber • matplotlib

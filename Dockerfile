@@ -1,6 +1,6 @@
 # Dockerfile for persistent cloud deployment of TDS Quiz Solver
 # Base image includes Playwright browsers (Chromium) already installed.
-FROM mcr.microsoft.com/playwright/python:v1.40.0-focal
+FROM mcr.microsoft.com/playwright/python:v1.40.0-jammy
 
 # Set workdir
 WORKDIR /app
