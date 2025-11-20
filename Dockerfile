@@ -12,14 +12,14 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt \
     && playwright install --with-deps chromium
 
-# Copy application source
+# Copy application files
 COPY . .
-
-# Copy environment template and rename to .env for Docker
-COPY .env.docker .env
 
 # Make startup script executable
 RUN chmod +x start.sh
+
+# Note: Environment variables will be provided by Render.com at runtime
+# No need to copy .env.docker since Render injects env vars directly
 
 # Expose FastAPI port (HF Spaces uses 7860 by default)
 EXPOSE 7860
