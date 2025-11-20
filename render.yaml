@@ -16,3 +16,7 @@ services:
         sync: false  # Will be added as secret via dashboard
       - key: PORT
         value: 7860
+      - key: ENABLE_KEEP_ALIVE
+        value: 1
+      - key: DISABLE_PLAYWRIGHT
+        value: 0

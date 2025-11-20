@@ -7,6 +7,7 @@ import asyncio
 from typing import Dict, Any
 from datetime import datetime
 import logging
+import httpx
 
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -41,8 +42,10 @@ else:
 RATE_LIMIT_WINDOW = int(os.getenv("RATE_LIMIT_WINDOW", "300"))  # seconds
 RATE_LIMIT_MAX = int(os.getenv("RATE_LIMIT_MAX", "40"))  # requests per window per IP
 DISABLE_PLAYWRIGHT = os.getenv("DISABLE_PLAYWRIGHT", "0") == "1"
+ENABLE_KEEP_ALIVE = os.getenv("ENABLE_KEEP_ALIVE", "1") == "1"  # Keep service awake
 
 _request_counts: Dict[str, Dict[str, Any]] = {}
+_keep_alive_task = None
 
 app = FastAPI(
     title="TDS Quiz Solver",
@@ -270,17 +273,46 @@ async def general_exception_handler(request: Request, exc: Exception):
     )
 
 
+async def keep_alive_ping():
+    """
+    Keep service awake by self-pinging every 10 minutes
+    Prevents Render free tier from sleeping during evaluation
+    """
+    await asyncio.sleep(60)  # Wait 1 minute after startup
+    
+    port = int(os.getenv("PORT", "7860"))
+    while True:
+        try:
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                await client.get(f"http://localhost:{port}/")
+                logger.info("✓ Keep-alive ping successful")
+        except Exception as e:
+            logger.warning(f"Keep-alive ping failed: {e}")
+        
+        await asyncio.sleep(600)  # Ping every 10 minutes
+
+
 @app.on_event("startup")
 async def startup_event():
     """
     Run on application startup
     """
+    global _keep_alive_task
+    
     logger.info("="*70)
     logger.info("TDS Quiz Solver API Starting")
     logger.info(f"Email configured: {EMAIL}")
     logger.info(f"Settings summary: {settings_summary()}")
     logger.info("="*70)
-    # Optional self-ping task to keep container warm
+    
+    # Start keep-alive task if enabled (default: enabled on Render)
+    if ENABLE_KEEP_ALIVE:
+        _keep_alive_task = asyncio.create_task(keep_alive_ping())
+        logger.info("✓ Keep-alive mechanism ENABLED (10-minute intervals)")
+    else:
+        logger.info("Keep-alive mechanism DISABLED")
+    
+    # Legacy self-ping support
     async def self_ping():
         import aiohttp
         while True:
