@@ -7,12 +7,18 @@ import asyncio
 import re
 import json
 import base64
+import os
 from typing import Optional, Dict, Any, List
 from io import BytesIO
 import logging
 from datetime import datetime
 
-from playwright.async_api import async_playwright, Browser, Page
+DISABLE_PLAYWRIGHT_ENV = os.getenv("DISABLE_PLAYWRIGHT", "0") == "1"
+try:
+    from playwright.async_api import async_playwright, Page  # type: ignore
+except Exception:
+    async_playwright = None  # type: ignore
+    Page = Any  # type: ignore
 import pandas as pd
 import matplotlib
 matplotlib.use('Agg')  # Non-interactive backend
@@ -34,7 +40,7 @@ class QuizSolver:
     Main class for solving TDS quiz challenges
     """
     
-    def __init__(self, email: str, timeout: int = 180):
+    def __init__(self, email: str, timeout: int = 180, disable_playwright: bool = False):
         """
         Initialize QuizSolver
         
@@ -44,7 +50,8 @@ class QuizSolver:
         """
         self.email = email
         self.timeout = timeout
-        self.browser: Optional[Browser] = None
+        self.browser: Optional[Any] = None
+        self.disable_playwright = disable_playwright or DISABLE_PLAYWRIGHT_ENV
         
     async def solve_chain(self, start_url: str) -> Dict[str, Any]:
         """
@@ -64,70 +71,19 @@ class QuizSolver:
         }
         
         try:
-            async with async_playwright() as p:
-                # Launch browser once for entire chain
-                self.browser = await p.chromium.launch(headless=True)
-                
-                current_url = start_url
-                quiz_number = 1
-                
-                while current_url:
-                    logger.info(f"\n{'='*60}")
-                    logger.info(f"Solving Quiz #{quiz_number}: {current_url}")
-                    logger.info(f"{'='*60}\n")
-                    
-                    try:
-                        # Solve single quiz with timeout
-                        result = await asyncio.wait_for(
-                            self.solve_single_quiz(current_url),
-                            timeout=self.timeout
-                        )
-                        
-                        results["quizzes_solved"] += 1
-                        results["details"].append({
-                            "quiz_number": quiz_number,
-                            "url": current_url,
-                            "status": "success",
-                            "answer": result.get("answer"),
-                            "next_url": result.get("next_url")
-                        })
-                        
-                        # Get next URL
-                        current_url = result.get("next_url")
-                        
-                        if not current_url:
-                            logger.info("Quiz chain completed!")
-                            break
-                            
-                    except asyncio.TimeoutError:
-                        logger.error(f"Quiz #{quiz_number} timed out after {self.timeout} seconds")
-                        results["quizzes_failed"] += 1
-                        results["details"].append({
-                            "quiz_number": quiz_number,
-                            "url": current_url,
-                            "status": "timeout"
-                        })
-                        break
-                        
-                    except Exception as e:
-                        logger.error(f"Error solving quiz #{quiz_number}: {e}")
-                        results["quizzes_failed"] += 1
-                        results["details"].append({
-                            "quiz_number": quiz_number,
-                            "url": current_url,
-                            "status": "error",
-                            "error": str(e)
-                        })
-                        break
-                    
-                    quiz_number += 1
-                
-                await self.browser.close()
-                
+            if not self.disable_playwright and async_playwright is not None:
+                async with async_playwright() as p:  # type: ignore
+                    self.browser = await p.chromium.launch(headless=True)
+                    chain_results = await self._solve_chain_loop(start_url)
+                    if self.browser:
+                        await self.browser.close()
+                results.update(chain_results)
+            else:
+                chain_results = await self._solve_chain_loop_requests(start_url)
+                results.update(chain_results)
         except Exception as e:
             logger.error(f"Error in quiz chain: {e}")
             results["error"] = str(e)
-        
         results["end_time"] = datetime.now().isoformat()
         return results
     
@@ -141,34 +97,84 @@ class QuizSolver:
         Returns:
             Dictionary with answer and next URL
         """
+        if self.disable_playwright:
+            return await self.solve_single_quiz_requests(quiz_url)
         try:
-            # Create new page
-            context = await self.browser.new_context()
+            context = await self.browser.new_context()  # type: ignore
             page = await context.new_page()
-            
-            # Navigate to quiz page
             logger.info(f"Loading quiz page: {quiz_url}")
             await page.goto(quiz_url, wait_until="networkidle", timeout=60000)
-            await asyncio.sleep(2)  # Wait for dynamic content
-            
-            # Extract page content
+            await asyncio.sleep(2)
             html = await page.content()
             text = await page.inner_text("body")
-            
             logger.info(f"Page loaded. Text length: {len(text)}")
-            
-            # Parse and solve the quiz
             result = await self.parse_and_solve(text, html, page)
-            
             await context.close()
-            
             return result
-            
         except Exception as e:
             logger.error(f"Error solving single quiz: {e}")
             raise
+
+    async def solve_single_quiz_requests(self, quiz_url: str) -> Dict[str, Any]:
+        import requests
+        logger.info(f"(Fallback) Fetching quiz page via requests: {quiz_url}")
+        resp = requests.get(quiz_url, timeout=30)
+        resp.raise_for_status()
+        html = resp.text
+        # crude text extraction
+        text = re.sub(r'<[^>]+>', ' ', html)
+        text = re.sub(r'\s+', ' ', text)
+        # Pass None for page (limited operations)
+        result = await self.parse_and_solve(text, html, page=None)  # type: ignore
+        return result
+
+    async def _solve_chain_loop(self, start_url: str) -> Dict[str, Any]:
+        results_partial = {"quizzes_solved": 0, "quizzes_failed": 0, "details": []}
+        current_url = start_url
+        quiz_number = 1
+        while current_url:
+            logger.info(f"\n{'='*60}\nSolving Quiz #{quiz_number}: {current_url}\n{'='*60}")
+            try:
+                result = await asyncio.wait_for(self.solve_single_quiz(current_url), timeout=self.timeout)
+                results_partial["quizzes_solved"] += 1
+                results_partial["details"].append({
+                    "quiz_number": quiz_number,
+                    "url": current_url,
+                    "status": "success",
+                    "answer": result.get("answer"),
+                    "next_url": result.get("next_url")
+                })
+                current_url = result.get("next_url")
+                if not current_url:
+                    logger.info("Quiz chain completed!")
+                    break
+            except asyncio.TimeoutError:
+                logger.error(f"Quiz #{quiz_number} timed out after {self.timeout} seconds")
+                results_partial["quizzes_failed"] += 1
+                results_partial["details"].append({
+                    "quiz_number": quiz_number,
+                    "url": current_url,
+                    "status": "timeout"
+                })
+                break
+            except Exception as e:
+                logger.error(f"Error solving quiz #{quiz_number}: {e}")
+                results_partial["quizzes_failed"] += 1
+                results_partial["details"].append({
+                    "quiz_number": quiz_number,
+                    "url": current_url,
+                    "status": "error",
+                    "error": str(e)
+                })
+                break
+            quiz_number += 1
+        return results_partial
+
+    async def _solve_chain_loop_requests(self, start_url: str) -> Dict[str, Any]:
+        # identical logic using requests fallback
+        return await self._solve_chain_loop(start_url)
     
-    async def parse_and_solve(self, text: str, html: str, page: Page) -> Dict[str, Any]:
+    async def parse_and_solve(self, text: str, html: str, page: Optional[Any]) -> Dict[str, Any]:
         """
         Parse quiz content and generate answer
         
@@ -275,7 +281,7 @@ class QuizSolver:
             logger.error(f"Error decoding Base64: {e}")
             return ""
     
-    async def determine_answer(self, text: str, html: str, page: Page,
+    async def determine_answer(self, text: str, html: str, page: Optional[Any],
                                pdf_links: List[str], csv_links: List[str], 
                                excel_links: List[str]) -> Any:
         """
@@ -297,20 +303,20 @@ class QuizSolver:
         # Load data if files are present
         df = None
         
-        if csv_links:
+        if csv_links and page is not None:
             # Get absolute URL
             csv_url = await self.get_absolute_url(page, csv_links[0])
             logger.info(f"Loading CSV: {csv_url}")
             df = load_data_from_url(csv_url)
             df = clean_data(df)
             
-        elif excel_links:
+        elif excel_links and page is not None:
             excel_url = await self.get_absolute_url(page, excel_links[0])
             logger.info(f"Loading Excel: {excel_url}")
             df = load_data_from_url(excel_url)
             df = clean_data(df)
             
-        elif pdf_links:
+        elif pdf_links and page is not None:
             pdf_url = await self.get_absolute_url(page, pdf_links[0])
             logger.info(f"Loading PDF: {pdf_url}")
             pdf_path = download_pdf(pdf_url)
@@ -504,7 +510,7 @@ class QuizSolver:
             logger.error(f"Error generating chart: {e}")
             raise
     
-    async def get_absolute_url(self, page: Page, url: str) -> str:
+    async def get_absolute_url(self, page: Any, url: str) -> str:
         """
         Convert relative URL to absolute URL
         

@@ -80,11 +80,30 @@ EMAIL=your.email@example.com
 SECRET=your_secret_key_here
 # Optional external API token (leave blank if not needed)
 PIPE_TOKEN=your_pipe_token_here
+# Optional runtime behavior flags
+DISABLE_PLAYWRIGHT=0            # Set to 1 to use requests-only fallback
+RATE_LIMIT_WINDOW=300           # Seconds per rate limit window
+RATE_LIMIT_MAX=40               # Max requests per IP per window
+ENABLE_SELF_PING=0              # Set to 1 to enable periodic self ping (requires aiohttp)
 ```
 
 **Important:** Replace the values with your actual email and secret key. Leave `PIPE_TOKEN` only if you need authenticated outbound API calls; otherwise omit it.
 
 The file `.env.example` contains a template. Never commit a real `PIPE_TOKEN`. It is treated like a password.
+
+### Environment Variable Reference
+
+| Variable | Required | Default | Purpose |
+| -------- | -------- | ------- | ------- |
+| `EMAIL` | Yes | – | Auth email matched on requests |
+| `SECRET` | Yes | – | Shared secret key to authorize `/solve` |
+| `PIPE_TOKEN` | No | – | External API bearer token (never logged) |
+| `DISABLE_PLAYWRIGHT` | No | `0` | Fallback to requests-only mode if Playwright/headless browser unavailable |
+| `RATE_LIMIT_WINDOW` | No | `300` | Rate limiting window (seconds) |
+| `RATE_LIMIT_MAX` | No | `40` | Max requests per IP per window |
+| `ENABLE_SELF_PING` | No | `0` | Keep-alive background ping (set `1` on hosts that sleep) |
+
+If deploying to a restricted environment (e.g. Hugging Face Python Space without Chromium), set `DISABLE_PLAYWRIGHT=1` to avoid browser startup errors.
 
 ## Usage
 
@@ -441,10 +460,13 @@ Two approaches:
   - Set environment variables in Space settings:
     - `EMAIL=24ds3000019@ds.study.iitm.ac.in`
     - `SECRET=banana`
+    - `DISABLE_PLAYWRIGHT=1` (recommended for Python Space unless you add system packages)
+    - Optional: `RATE_LIMIT_WINDOW`, `RATE_LIMIT_MAX`, `ENABLE_SELF_PING=1`
   - Optional: `PORT=7860` (Spaces default). Uvicorn in `main.py` is only used when run as script; Spaces launches `app` automatically.
   - Test: `https://<space-username>-<space-name>.hf.space/` and `/solve`.
 
   Playwright note: The base Python Space might miss OS packages (fonts, sandbox libs). If page scraping fails, switch to Docker.
+  Fallback mode (`DISABLE_PLAYWRIGHT=1`) uses `requests` for HTML; dynamic JS content may not fully render, but simple quizzes still work.
 
 2. Docker Space (full control, Playwright browsers)
   - Choose SDK = "Docker" when creating Space.
@@ -470,6 +492,12 @@ RUN apt-get update && apt-get install -y libnss3 libasound2 && rm -rf /var/lib/a
 After deployment, your public endpoint example:
 ```
 https://<space-username>-tds-quiz-solver.hf.space/solve
+```
+Test quickly:
+```bash
+curl -X POST https://<space-username>-tds-quiz-solver.hf.space/solve \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"24ds3000019@ds.study.iitm.ac.in","secret":"banana","url":"https://tds-llm-analysis.s-anand.net/demo"}'
 ```
 
 ## License

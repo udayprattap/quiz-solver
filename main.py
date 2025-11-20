@@ -9,6 +9,7 @@ from datetime import datetime
 import logging
 
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
@@ -37,11 +38,38 @@ else:
     logger.info("PIPE_TOKEN not set; continuing without external API token")
 
 # Create FastAPI app
+RATE_LIMIT_WINDOW = int(os.getenv("RATE_LIMIT_WINDOW", "300"))  # seconds
+RATE_LIMIT_MAX = int(os.getenv("RATE_LIMIT_MAX", "40"))  # requests per window per IP
+DISABLE_PLAYWRIGHT = os.getenv("DISABLE_PLAYWRIGHT", "0") == "1"
+
+_request_counts: Dict[str, Dict[str, Any]] = {}
+
 app = FastAPI(
     title="TDS Quiz Solver",
     description="Automated quiz-solving system for TDS LLM Analysis challenge",
     version="1.0.0"
 )
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.middleware("http")
+async def rate_limit_middleware(request: Request, call_next):
+    ip = request.client.host if request.client else "unknown"
+    now = datetime.utcnow().timestamp()
+    bucket = _request_counts.get(ip)
+    if not bucket or now - bucket["start"] > RATE_LIMIT_WINDOW:
+        bucket = {"start": now, "count": 0}
+        _request_counts[ip] = bucket
+    bucket["count"] += 1
+    if bucket["count"] > RATE_LIMIT_MAX:
+        return JSONResponse(status_code=429, content={"status": "error", "error": "rate limit exceeded"})
+    return await call_next(request)
 
 
 class QuizRequest(BaseModel):
@@ -69,7 +97,22 @@ async def health_check():
         "status": "ready",
         "service": "TDS Quiz Solver",
         "version": "1.0.0",
-        "timestamp": datetime.now().isoformat()
+        "timestamp": datetime.now().isoformat(),
+        "playwright_enabled": not DISABLE_PLAYWRIGHT,
+        "rate_limit_window": RATE_LIMIT_WINDOW,
+        "rate_limit_max": RATE_LIMIT_MAX
+    }
+
+
+@app.get("/info")
+async def info():
+    return {
+        "settings": settings_summary(),
+        "playwright_enabled": not DISABLE_PLAYWRIGHT,
+        "rate_limit": {
+            "window_seconds": RATE_LIMIT_WINDOW,
+            "max_requests": RATE_LIMIT_MAX
+        }
     }
 
 
@@ -153,7 +196,7 @@ async def solve_quiz_background(email: str, start_url: str):
         logger.info(f"{'='*70}\n")
         
         # Create solver instance
-        solver = QuizSolver(email=email, timeout=180)
+        solver = QuizSolver(email=email, timeout=180, disable_playwright=DISABLE_PLAYWRIGHT)
         
         # Solve the quiz chain
         results = await solver.solve_chain(start_url)
@@ -237,6 +280,18 @@ async def startup_event():
     logger.info(f"Email configured: {EMAIL}")
     logger.info(f"Settings summary: {settings_summary()}")
     logger.info("="*70)
+    # Optional self-ping task to keep container warm
+    async def self_ping():
+        import aiohttp
+        while True:
+            try:
+                async with aiohttp.ClientSession() as session:
+                    await session.get("http://localhost:8000/")
+            except Exception:
+                pass
+            await asyncio.sleep(120)  # every 2 minutes
+    if os.getenv("ENABLE_SELF_PING", "0") == "1":
+        asyncio.create_task(self_ping())
 
 
 @app.on_event("shutdown")
