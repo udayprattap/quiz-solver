@@ -12,4 +12,7 @@ services:
         value: 24ds3000019@ds.study.iitm.ac.in
       - key: SECRET
         value: banana
-    # PIPE_TOKEN can be added later via dashboard secret
+      - key: PIPE_TOKEN
+        sync: false  # Will be added as secret via dashboard
+      - key: PORT
+        value: 7860
