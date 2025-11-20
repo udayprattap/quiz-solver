@@ -11,12 +11,9 @@ import logging
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
-from dotenv import load_dotenv
 
 from quiz_solver import QuizSolver
-
-# Load environment variables
-load_dotenv()
+from config import EMAIL, SECRET, get_pipe_token, validate_core_credentials, settings_summary
 
 # Configure logging
 logging.basicConfig(
@@ -25,13 +22,19 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Get credentials from environment
-EMAIL = os.getenv("EMAIL")
-SECRET = os.getenv("SECRET")
+# Validate mandatory credentials
+try:
+    validate_core_credentials()
+except ValueError as cred_err:
+    logger.error(str(cred_err))
+    raise
 
-if not EMAIL or not SECRET:
-    logger.error("EMAIL and SECRET must be set in .env file")
-    raise ValueError("EMAIL and SECRET environment variables are required")
+# Optional PIPE token presence (never log full token)
+PIPE_TOKEN_PRESENT = bool(get_pipe_token())
+if PIPE_TOKEN_PRESENT:
+    logger.info("PIPE_TOKEN detected (redacted)")
+else:
+    logger.info("PIPE_TOKEN not set; continuing without external API token")
 
 # Create FastAPI app
 app = FastAPI(
@@ -231,7 +234,8 @@ async def startup_event():
     """
     logger.info("="*70)
     logger.info("TDS Quiz Solver API Starting")
-    logger.info(f"Email: {EMAIL}")
+    logger.info(f"Email configured: {EMAIL}")
+    logger.info(f"Settings summary: {settings_summary()}")
     logger.info("="*70)
 
 

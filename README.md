@@ -78,9 +78,13 @@ Create a `.env` file in the project root with your credentials:
 ```bash
 EMAIL=your.email@example.com
 SECRET=your_secret_key_here
+# Optional external API token (leave blank if not needed)
+PIPE_TOKEN=your_pipe_token_here
 ```
 
-**Important:** Replace the values with your actual email and secret key.
+**Important:** Replace the values with your actual email and secret key. Leave `PIPE_TOKEN` only if you need authenticated outbound API calls; otherwise omit it.
+
+The file `.env.example` contains a template. Never commit a real `PIPE_TOKEN`. It is treated like a password.
 
 ## Usage
 
@@ -302,11 +306,25 @@ def process_new_format(url: str) -> pd.DataFrame:
 
 ## Security
 
-- Environment variables for sensitive data
+- Environment variables for sensitive data (`EMAIL`, `SECRET`, optional `PIPE_TOKEN`)
 - Secret key validation on all requests
 - Email matching verification
-- No credentials in logs or responses
+- Token redaction: application logs only whether `PIPE_TOKEN` is set, never the full value
+- No credentials or raw tokens in responses
 - HTTPS support for production deployment
+
+### Using PIPE_TOKEN (Optional)
+
+If you need to call an external API requiring bearer authentication:
+
+```python
+from config import get_pipe_token
+token = get_pipe_token()
+if token:
+  headers = {"Authorization": f"Bearer {token}", "Accept": "application/json"}
+```
+
+If `PIPE_TOKEN` is absent, code should gracefully skip authenticated requests.
 
 ## Production Deployment
 
