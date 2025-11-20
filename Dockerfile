@@ -15,16 +15,19 @@ RUN pip install --no-cache-dir -r requirements.txt \
 # Copy application source
 COPY . .
 
-# Expose FastAPI port
-EXPOSE 8000
+# Make startup script executable
+RUN chmod +x start.sh
+
+# Expose FastAPI port (HF Spaces uses 7860 by default)
+EXPOSE 7860
 
 # Environment variables (override at runtime)
 ENV PYTHONUNBUFFERED=1 \
-    PORT=8000
+    PORT=7860
 
-# Health check (optional for some platforms)
-# HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
-#   CMD curl -f http://localhost:8000/ || exit 1
+# Health check for container orchestration
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+  CMD python -c "import requests; requests.get('http://localhost:7860/', timeout=5)" || exit 1
 
-# Run uvicorn server
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run uvicorn server using startup script
+CMD ["./start.sh"]
