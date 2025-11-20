@@ -280,4 +280,3 @@ def get_llm_analyzer() -> LLMQuestionAnalyzer:
     if _llm_analyzer is None:
         _llm_analyzer = LLMQuestionAnalyzer()
     return _llm_analyzer
-curl https://quiz-solver-15k6.onrender.com/curl https://quiz-solver-15k6.onrender.com/curl https://quiz-solver-15k6.onrender.com/
