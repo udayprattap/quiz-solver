@@ -511,8 +511,8 @@ curl http://localhost:7860/
    - **Important**: `render.yaml` env vars only apply at creation, not updates
    - Go to Dashboard → Your Service → Environment
    - Add manually:
-     - `EMAIL` = 24ds3000019@ds.study.iitm.ac.in
-     - `SECRET` = banana
+     - `EMAIL` = your.email@example.com
+     - `SECRET` = your_secret_key
      - `PIPE_TOKEN` = (your OpenAI-compatible token)
      - `PORT` = 7860
      - `ENABLE_KEEP_ALIVE` = 1
