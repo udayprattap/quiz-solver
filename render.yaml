@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: tds-quiz-solver
+    env: docker
+    plan: free
+    autoDeploy: true
+    region: singapore
+    dockerfilePath: Dockerfile
+    healthCheckPath: /
+    envVars:
+      - key: EMAIL
+        value: 24ds3000019@ds.study.iitm.ac.in
+      - key: SECRET
+        value: banana
+    # PIPE_TOKEN can be added later via dashboard secret

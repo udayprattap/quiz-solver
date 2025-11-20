@@ -342,6 +342,67 @@ Example production command:
 uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
 ```
 
+### Docker Deployment
+
+Build and run locally:
+```bash
+docker build -t tds-quiz-solver .
+docker run -p 8000:8000 --env EMAIL=24ds3000019@ds.study.iitm.ac.in --env SECRET=banana tds-quiz-solver
+```
+Test:
+```bash
+curl http://localhost:8000/
+```
+
+### Render (Managed Hosting)
+
+1. Push repository (already done). Make repo public.
+2. In Render dashboard: New ➜ "Blueprint" ➜ select repo.
+3. Render auto-detects `render.yaml`. Adjust EMAIL/SECRET in dashboard if needed.
+4. Deploy; after build, note the public URL: `https://tds-quiz-solver.onrender.com/solve` (example).
+5. Confirm health:
+```bash
+curl https://<render_url>/
+```
+
+### Railway / Fly.io / Cloud Run (Alternatives)
+
+Cloud Run quick deploy:
+```bash
+gcloud builds submit --tag gcr.io/PROJECT_ID/tds-quiz-solver
+gcloud run deploy tds-quiz-solver --image gcr.io/PROJECT_ID/tds-quiz-solver --region=asia-south1 --platform=managed --allow-unauthenticated
+```
+
+Fly.io quick start:
+```bash
+fly launch --no-deploy
+fly deploy
+```
+
+Railway:
+1. Create project ➜ Add service ➜ GitHub repo.
+2. Set variables EMAIL / SECRET.
+3. Deploy.
+
+### Keep Service Awake During Evaluation
+
+Choose any provider without sleep (Render free may sleep after inactivity; wake before window). For guaranteed uptime use: Cloud Run, Fly.io, Railway.
+
+Recommended timeline (IST):
+| Time (IST) | Action |
+| ---------- | ------ |
+| 14:30      | Trigger deployment / wake service |
+| 14:45      | Manual health check & test POST /solve |
+| 14:55      | Provide endpoint URL to evaluation system |
+| 15:00–16:00| Monitoring only; keep logs open |
+
+Monitoring command:
+```bash
+watch -n 30 curl -s https://<your_public_url>/ | jq .status
+```
+
+If failure detected, redeploy or restart container; endpoint should resume quickly.
+
 ### Public Exposure (ngrok)
 
 For the evaluation window (Sat 29 Nov 2025 15:00–16:00 IST):
