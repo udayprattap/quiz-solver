@@ -9,9 +9,9 @@ services:
     healthCheckPath: /
     envVars:
       - key: EMAIL
-        value: 24ds3000019@ds.study.iitm.ac.in
+        value: your.email@example.com
       - key: SECRET
-        value: banana
+        value: your_secret_key
       - key: PIPE_TOKEN
         sync: false  # Will be added as secret via dashboard
       - key: PORT
