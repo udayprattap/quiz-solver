@@ -32,6 +32,13 @@ from utils.data_analyzer import (
     calculate_median, value_counts, filter_dataframe
 )
 
+# LLM integration for intelligent question analysis
+try:
+    from llm_helper import get_llm_analyzer
+    LLM_AVAILABLE = True
+except ImportError:
+    LLM_AVAILABLE = False
+
 logger = logging.getLogger(__name__)
 
 
@@ -287,6 +294,9 @@ class QuizSolver:
         """
         Determine the answer based on question content
         
+        Uses LLM (if available) for intelligent question understanding,
+        with rule-based fallback for robustness.
+        
         Args:
             text: Question text
             html: Page HTML
@@ -299,6 +309,15 @@ class QuizSolver:
             Answer (can be int, float, str, bool, dict, or base64 image)
         """
         text_lower = text.lower()
+        
+        # Initialize LLM analyzer if available
+        llm_analyzer = None
+        if LLM_AVAILABLE:
+            try:
+                llm_analyzer = get_llm_analyzer()
+                logger.info(f"🤖 LLM analyzer {'enabled' if llm_analyzer.enabled else 'disabled (fallback mode)'}")
+            except Exception as e:
+                logger.warning(f"Failed to initialize LLM analyzer: {e}")
         
         # Load data if files are present
         df = None
@@ -333,6 +352,43 @@ class QuizSolver:
         if df is not None:
             logger.info(f"DataFrame loaded: {df.shape}")
             logger.info(f"Columns: {list(df.columns)}")
+            
+            # Try LLM analysis first
+            if llm_analyzer and llm_analyzer.enabled:
+                try:
+                    logger.info("🤖 Attempting LLM-powered question analysis...")
+                    
+                    data_info = {
+                        "dataframe": df,
+                        "columns": list(df.columns),
+                        "shape": df.shape,
+                        "data_source": "csv/excel/pdf"
+                    }
+                    
+                    llm_result = await llm_analyzer.analyze_question(
+                        question_text=text,
+                        available_data=data_info,
+                        html_content=html[:1000] if html else None
+                    )
+                    
+                    if not llm_result.get("fallback_used"):
+                        logger.info(f"✅ LLM analysis successful (confidence: {llm_result.get('confidence', 0):.2f})")
+                        
+                        # Try to execute LLM's suggested approach
+                        llm_answer = await self._execute_llm_suggestion(df, llm_result)
+                        if llm_answer is not None:
+                            logger.info(f"✅ LLM-generated answer: {llm_answer}")
+                            return llm_answer
+                        else:
+                            logger.info("⚠️  LLM suggestion execution failed, falling back to rules")
+                    else:
+                        logger.info("ℹ️  LLM requested fallback to rule-based logic")
+                        
+                except Exception as e:
+                    logger.warning(f"⚠️  LLM analysis error: {e} - falling back to rule-based logic")
+            
+            # Fallback: Rule-based keyword matching (original logic)
+            logger.info("📋 Using rule-based keyword matching...")
             
             # Determine operation based on keywords
             if any(keyword in text_lower for keyword in ['sum', 'total', 'add']):
@@ -403,6 +459,65 @@ class QuizSolver:
         
         # Return string answer
         return "42"  # Default fallback
+    
+    async def _execute_llm_suggestion(self, df: pd.DataFrame, llm_result: Dict[str, Any]) -> Any:
+        """
+        Execute the operation suggested by LLM analysis
+        
+        Args:
+            df: DataFrame to operate on
+            llm_result: LLM analysis result
+            
+        Returns:
+            Answer or None if execution fails
+        """
+        try:
+            operation = llm_result.get("operation", "").lower()
+            column = llm_result.get("column")
+            filter_col = llm_result.get("filter_column")
+            filter_val = llm_result.get("filter_value")
+            
+            # Apply filter if specified
+            working_df = df
+            if filter_col and filter_val and filter_col in df.columns:
+                logger.info(f"Applying filter: {filter_col} == {filter_val}")
+                working_df = df[df[filter_col] == filter_val]
+            
+            # Execute operation
+            if operation == "sum" and column and column in working_df.columns:
+                return int(working_df[column].sum())
+            
+            elif operation == "count":
+                return int(len(working_df))
+            
+            elif operation == "mean" and column and column in working_df.columns:
+                return float(working_df[column].mean())
+            
+            elif operation == "median" and column and column in working_df.columns:
+                return float(working_df[column].median())
+            
+            elif operation == "max" and column and column in working_df.columns:
+                return working_df[column].max()
+            
+            elif operation == "min" and column and column in working_df.columns:
+                return working_df[column].min()
+            
+            elif operation == "chart":
+                chart_type = llm_result.get("chart_type", "bar")
+                return self.generate_chart(working_df, f"{chart_type} chart")
+            
+            elif operation == "boolean":
+                # For true/false questions, use LLM's confidence
+                confidence = llm_result.get("confidence", 0.5)
+                return confidence > 0.6
+            
+            else:
+                logger.warning(f"Unsupported LLM operation: {operation}")
+                return None
+                
+        except Exception as e:
+            logger.error(f"LLM suggestion execution failed: {e}")
+            return None
     
     def identify_column(self, text: str, columns: List[str]) -> Optional[str]:
         """
