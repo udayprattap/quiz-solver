@@ -11,3 +11,4 @@ beautifulsoup4==4.12.2
 Pillow==10.1.0
 matplotlib==3.8.2
 seaborn==0.13.0
+pyngrok==7.1.6

@@ -342,6 +342,34 @@ Example production command:
 uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
 ```
 
+### Public Exposure (ngrok)
+
+For the evaluation window (Sat 29 Nov 2025 15:00–16:00 IST):
+
+1. Install dependency:
+```bash
+pip install pyngrok
+```
+2. (Optional) Set authtoken for stable tunnels:
+```bash
+ngrok config add-authtoken <YOUR_TOKEN>
+```
+3. Use helper script:
+```bash
+python run_with_ngrok.py --port 8000
+```
+4. Note printed `Solve Endpoint` URL and submit that.
+
+Start at ~14:45 IST to ensure tunnel readiness. Free ngrok session (≈2h) covers the 1h evaluation window.
+
+If tunnel drops:
+```bash
+Ctrl+C
+python run_with_ngrok.py --port 8000
+```
+
+To use a reserved domain (paid): set `--authtoken` or configure ngrok dashboard then run script.
+
 ## License
 
 Licensed under the MIT License. See the `LICENSE` file for details.
