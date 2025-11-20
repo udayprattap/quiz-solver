@@ -431,6 +431,47 @@ python run_with_ngrok.py --port 8000
 
 To use a reserved domain (paid): set `--authtoken` or configure ngrok dashboard then run script.
 
+### Hugging Face Spaces Deployment
+
+Two approaches:
+
+1. Python Space (simpler, may have Playwright limits)
+  - Create a new Space: "New Space" ➜ choose SDK = "Python"
+  - Add files from repo (`app.py`, `requirements.txt`, source files)
+  - Set environment variables in Space settings:
+    - `EMAIL=24ds3000019@ds.study.iitm.ac.in`
+    - `SECRET=banana`
+  - Optional: `PORT=7860` (Spaces default). Uvicorn in `main.py` is only used when run as script; Spaces launches `app` automatically.
+  - Test: `https://<space-username>-<space-name>.hf.space/` and `/solve`.
+
+  Playwright note: The base Python Space might miss OS packages (fonts, sandbox libs). If page scraping fails, switch to Docker.
+
+2. Docker Space (full control, Playwright browsers)
+  - Choose SDK = "Docker" when creating Space.
+  - Use the provided `Dockerfile` directly.
+  - Ensure Dockerfile includes `playwright install --with-deps chromium` (already present).
+  - Set env vars via Space Secrets panel.
+
+Keep Alive: Spaces remain generally available; however heavy scraping may exceed CPU limits on free tier. For evaluation hour your traffic is minimal.
+
+#### Troubleshooting on Spaces
+| Symptom | Likely Cause | Fix |
+| ------- | ------------ | ---- |
+| 502 Bad Gateway | Build still starting | Wait or check build logs |
+| Timeout solving quiz | Chromium missing deps | Use Docker Space or add apt packages |
+| Import error (playwright) | Missing install | Ensure requirements and Docker build step |
+| Cannot reach /solve | Wrong path or Space not running | Check logs; confirm FastAPI `app` imported in `app.py` |
+
+#### Minimal apt additions (if customizing Docker Space further)
+```Dockerfile
+RUN apt-get update && apt-get install -y libnss3 libasound2 && rm -rf /var/lib/apt/lists/*
+```
+
+After deployment, your public endpoint example:
+```
+https://<space-username>-tds-quiz-solver.hf.space/solve
+```
+
 ## License
 
 Licensed under the MIT License. See the `LICENSE` file for details.
