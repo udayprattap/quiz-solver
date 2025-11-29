@@ -57,3 +57,4 @@ dmypy.json
 *.wav
 *.mp3
 *.m4a
+challenge_results.json
