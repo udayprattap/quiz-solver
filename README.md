@@ -1,148 +1,119 @@
-# 🧠 TDS Quiz Solver
+# 🧠 TDS Quiz & Challenge Solver
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104.1-009688.svg)](https://fastapi.tiangolo.com)
-[![Docker](https://img.shields.io/badge/docker-ready-brightgreen.svg)](https://www.docker.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Playwright](https://img.shields.io/badge/Playwright-1.40.0-45ba4b.svg)](https://playwright.dev/)
 
-**Automated Quiz-Solving System for TDS LLM Analysis Challenge**
+**Unified solution for TDS LLM Analysis Challenges (Project 1 & Project 2)**
 
-An intelligent webhook-based system that automatically receives quiz URLs, scrapes web pages with Playwright, processes data files (PDF/CSV/Excel), analyzes questions using **GPT-4 LLM** with rule-based fallbacks, generates accurate answers, and submits them—all within a 3-minute timeout window.
+This repository contains automated solvers for:
+1. **Project 1**: A webhook-based quiz solver using Playwright and GPT-4.
+2. **Project 2**: A 21-stage multi-modal challenge solver (Audio, PDF, Images, CSV, etc.).
 
 ---
 
 ## 📑 Table of Contents
 
-- [Features](#-features)
-- [Tech Stack](#-tech-stack)
+- [Project 2: Challenge Solver](#-project-2-challenge-solver)
+- [Project 1: Quiz Webhook](#-project-1-quiz-webhook)
 - [Prerequisites](#-prerequisites)
 - [Installation](#-installation)
 - [Configuration](#-configuration)
 - [Usage](#-usage)
-- [API Documentation](#-api-documentation)
-- [Testing](#-testing)
-- [Deployment](#-deployment)
-- [Troubleshooting](#-troubleshooting)
-- [Project Structure](#-project-structure)
 - [License](#-license)
-- [Contact](#-contact)
 
 ---
 
-## ✨ Features
+## 🏆 Project 2: Challenge Solver
 
-### Core Capabilities
-- **Webhook Endpoint**: FastAPI-powered `/solve` endpoint for receiving quiz challenges
-- **Intelligent Browser Automation**: Playwright headless Chromium for JavaScript-rendered pages
-- **Multi-Format Data Processing**: 
-  - PDF table extraction (pdfplumber)
-  - CSV/Excel loading and cleaning (pandas)
-  - HTML table parsing (BeautifulSoup4)
-- **LLM-Powered Analysis**: OpenAI GPT-4 integration for complex question parsing with PIPE_TOKEN
-- **Smart Question Analysis**: LLM-first approach with rule-based fallback (keyword detection for sum, count, average, max, min, filter)
-- **Automatic Answer Generation**:
-  - Numeric answers (int, float)
-  - Boolean answers (true/false)
-  - Chart generation (Base64-encoded PNG via matplotlib)
-  - JSON objects for complex answers
-- **Quiz Chain Handling**: Automatically follows next_url to solve sequential quizzes
-- **Background Processing**: Non-blocking async task execution
-- **Robust Error Handling**: 3-minute timeout, 3-attempt retry logic, graceful fallbacks
+A standalone async script (`project2_solver.py`) that solves the 21-stage TDS Project 2 challenge.
 
-### Production Features
-- **Rate Limiting**: IP-based request throttling (configurable window & max)
-- **Authentication**: Email + Secret validation
-- **Health Monitoring**: `/` health check and `/info` diagnostics endpoints
-- **Environment-Based Configuration**: Support for multiple deployment modes
-- **Playwright Fallback**: Optional requests-only mode for restricted environments
-- **Keep-Alive Mechanism**: Self-ping every 10 minutes to prevent service sleep on free tier hosting
-- **Comprehensive Logging**: Detailed execution traces for debugging
+### Capabilities
+- **Multi-Modal Processing**:
+  - 🎙️ **Audio**: Transcribes WAV files using Google Speech Recognition.
+  - 📄 **PDF**: Extracts tables and text using `pdfplumber`.
+  - 🖼️ **Images**: Analyzes pixel data (heatmaps) using `Pillow`.
+  - 📊 **Data**: Processes CSV/JSON logs using `pandas`.
+- **Automated Workflow**:
+  - Fetches questions from the challenge API.
+  - Routes to specific solvers based on question type.
+  - Submits answers and handles the challenge lifecycle.
+- **Resilience**:
+  - Handles rate limits and server errors.
+  - Includes fallback logic for complex stages.
+
+### Running the Solver
+
+```bash
+python project2_solver.py
+```
+
+The script will:
+1. Authenticate using your `EMAIL` and `SECRET`.
+2. Iterate through all 21 stages.
+3. Print progress and results to the console.
+4. Log detailed debug info to `solver.log`.
 
 ---
 
-## 🛠️ Tech Stack
+## 🌐 Project 1: Quiz Webhook
 
-| Category | Technology | Version | Purpose |
-|----------|-----------|---------|---------|
-| **Backend** | Python | 3.10+ | Core runtime |
-| **Web Framework** | FastAPI | 0.104.1 | API endpoints |
-| **ASGI Server** | Uvicorn | 0.24.0 | Production server |
-| **LLM** | OpenAI | 1.54.0 | GPT-4 integration |
-| **Browser Automation** | Playwright | 1.40.0 | JavaScript rendering |
-| **Data Processing** | pandas | 2.1.3 | Data manipulation |
-| **PDF Parsing** | pdfplumber | 0.10.3 | Table extraction |
-| **Excel Support** | openpyxl | 3.1.2 | .xlsx files |
-| **Web Scraping** | BeautifulSoup4 | 4.12.2 | HTML parsing |
-| **Visualization** | matplotlib | 3.8.2 | Chart generation |
-| **Visualization** | seaborn | 0.13.0 | Statistical plots |
-| **HTTP Client** | requests | 2.31.0 | Answer submission |
-| **Async HTTP** | httpx | 0.27.0 | Keep-alive pings |
-| **Containerization** | Docker | - | Deployment |
-| **Environment Config** | python-dotenv | 1.0.0 | .env support |
+An intelligent webhook-based system that automatically receives quiz URLs, scrapes web pages, and submits answers.
+
+### Features
+- **Webhook Endpoint**: `/solve` endpoint for receiving quiz challenges.
+- **Playwright Automation**: Headless browser for rendering quiz pages.
+- **LLM Integration**: Uses GPT-4 for complex question analysis.
+- **Production Ready**: Dockerized with rate limiting and keep-alive mechanisms.
+
+### Running the Webhook
+
+```bash
+# Start the server
+uvicorn main:app --host 0.0.0.0 --port 7860
+```
+
+Then send a POST request to `http://localhost:7860/solve`.
 
 ---
 
 ## 📋 Prerequisites
 
-### Required
 - **Python**: 3.10 or higher
-- **pip**: Package installer for Python
-- **Internet Connection**: For downloading files and submitting answers
-
-### Optional (for development)
-- **Docker**: For containerized deployment
-- **Git**: For version control
-- **Virtual Environment**: Recommended for isolation
-
-### System Requirements
-- **OS**: macOS, Linux, or Windows
-- **RAM**: 2GB minimum (4GB recommended for Playwright)
-- **Disk Space**: 500MB for dependencies + Chromium browser
+- **FFmpeg**: Required for audio processing (Project 2).
+  - macOS: `brew install ffmpeg`
+  - Ubuntu: `sudo apt install ffmpeg`
+  - Windows: Download from [ffmpeg.org](https://ffmpeg.org/)
 
 ---
 
 ## 🚀 Installation
 
-### 1. Clone the Repository
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/udayprattap/quiz-solver.git
+   cd quiz-solver
+   ```
 
-```bash
-git clone https://github.com/udayprattap/quiz-solver.git
-cd quiz-solver
-```
+2. **Create Virtual Environment**
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate  # Windows: .venv\Scripts\activate
+   ```
 
-### 2. Create Virtual Environment (Recommended)
+3. **Install Dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-```bash
-# Create virtual environment
-python3 -m venv .venv
+4. **Install Playwright Browsers** (for Project 1)
+   ```bash
+   playwright install chromium
+   ```
 
-# Activate it
-# On macOS/Linux:
-source .venv/bin/activate
+---
 
-# On Windows:
-.venv\Scripts\activate
-```
-
-### 3. Install Python Dependencies
-
-```bash
-pip install --upgrade pip
-pip install -r requirements.txt
-```
-
-### 4. Install Playwright Browsers
-
-```bash
-# Install Chromium browser for Playwright
-playwright install chromium
-
-# If you encounter permission issues on Linux:
-playwright install --with-deps chromium
-```
-
-### 5. Configure Environment Variables
+## ⚙️ Configuration
 
 Create a `.env` file in the project root:
 
@@ -153,517 +124,14 @@ cp .env.example .env
 Edit `.env` with your credentials:
 
 ```env
-# Required
+# Required for both projects
 EMAIL=your.email@example.com
 SECRET=your_secret_key
 
 # Optional
 PIPE_TOKEN=your_openai_compatible_token
-DISABLE_PLAYWRIGHT=0
 PORT=7860
-RATE_LIMIT_WINDOW=300
-RATE_LIMIT_MAX=40
-ENABLE_KEEP_ALIVE=1
 ```
-
----
-
-## ⚙️ Configuration
-
-### Environment Variables
-
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `EMAIL` | ✅ Yes | - | Your registered email address for authentication |
-| `SECRET` | ✅ Yes | - | Secret key for request authorization |
-| `PIPE_TOKEN` | ❌ No | - | OpenAI-compatible API token for GPT-4 LLM (used as OpenAI API key) |
-| `PORT` | ❌ No | `7860` | Server port (standard for Render.com and HF Spaces) |
-| `DISABLE_PLAYWRIGHT` | ❌ No | `0` | Set to `1` for requests-only fallback mode |
-| `RATE_LIMIT_WINDOW` | ❌ No | `300` | Rate limit time window (seconds) |
-| `RATE_LIMIT_MAX` | ❌ No | `40` | Max requests per IP per window |
-| `ENABLE_KEEP_ALIVE` | ❌ No | `1` | Self-ping every 10 minutes to prevent service sleep (Render free tier) |
-
-### Configuration Scenarios
-
-**Development (Local)**:
-```env
-EMAIL=your.email@example.com
-SECRET=your_secret
-DISABLE_PLAYWRIGHT=0
-```
-
-**Production (Docker)**:
-```env
-EMAIL=your.email@example.com
-SECRET=your_secret
-DISABLE_PLAYWRIGHT=0
-RATE_LIMIT_WINDOW=300
-RATE_LIMIT_MAX=40
-```
-
-**Restricted Environment (No Browser)**:
-```env
-EMAIL=your.email@example.com
-SECRET=your_secret
-DISABLE_PLAYWRIGHT=1
-```
-
----
-
-## 💻 Usage
-
-### Starting the Server
-
-#### Development Mode (with auto-reload)
-
-```bash
-uvicorn main:app --host 0.0.0.0 --port 7860 --reload
-```
-
-#### Production Mode
-
-```bash
-uvicorn main:app --host 0.0.0.0 --port 7860 --workers 4
-```
-
-#### Direct Python Execution
-
-```bash
-python main.py
-```
-
-The server will start at `http://localhost:7860`
-
-### Making Requests
-
-#### Health Check
-
-```bash
-curl http://localhost:7860/
-```
-
-**Expected Response:**
-```json
-{
-  "status": "ready",
-  "service": "TDS Quiz Solver",
-  "version": "1.0.0",
-  "timestamp": "2025-11-20T10:30:00.000000",
-  "playwright_enabled": true,
-  "rate_limit_window": 300,
-  "rate_limit_max": 40
-}
-```
-
-#### System Information
-
-```bash
-curl http://localhost:7860/info
-```
-
-#### Solve a Quiz
-
-```bash
-curl -X POST http://localhost:7860/solve \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "your.email@example.com",
-    "secret": "your_secret_key",
-    "url": "https://tds-llm-analysis.s-anand.net/demo"
-  }'
-```
-
-**Expected Response:**
-```json
-{
-  "status": "processing",
-  "message": "Quiz solving started for URL: https://tds-llm-analysis.s-anand.net/demo"
-}
-```
-
----
-
-## 📚 API Documentation
-
-### Endpoints
-
-#### `GET /`
-
-Health check endpoint.
-
-**Response: 200 OK**
-```json
-{
-  "status": "ready",
-  "service": "TDS Quiz Solver",
-  "version": "1.0.0",
-  "timestamp": "2025-11-20T10:30:00.000000",
-  "playwright_enabled": true,
-  "rate_limit_window": 300,
-  "rate_limit_max": 40
-}
-```
-
----
-
-#### `GET /info`
-
-System information and configuration details.
-
-**Response: 200 OK**
-```json
-{
-  "settings": {
-    "email": "your.email@example.com",
-    "pipe_token_present": false
-  },
-  "playwright_enabled": true,
-  "rate_limit": {
-    "window_seconds": 300,
-    "max_requests": 40
-  }
-}
-```
-
----
-
-#### `POST /solve`
-
-Submit a quiz URL for automated solving.
-
-**Request Body:**
-```json
-{
-  "email": "your.email@example.com",
-  "secret": "your_secret_key",
-  "url": "https://quiz-url.com/start"
-}
-```
-
-**Response: 200 OK** (Immediate)
-```json
-{
-  "status": "processing",
-  "message": "Quiz solving started for URL: https://quiz-url.com/start"
-}
-```
-
-**Error Responses:**
-
-- **403 Forbidden** - Invalid secret or email mismatch
-```json
-{
-  "status": "error",
-  "error": "Invalid secret key",
-  "status_code": 403
-}
-```
-
-- **429 Too Many Requests** - Rate limit exceeded
-```json
-{
-  "status": "error",
-  "error": "rate limit exceeded"
-}
-```
-
-- **422 Unprocessable Entity** - Invalid request format
-```json
-{
-  "detail": [
-    {
-      "loc": ["body", "email"],
-      "msg": "field required",
-      "type": "value_error.missing"
-    }
-  ]
-}
-```
-
-- **500 Internal Server Error** - Server error
-```json
-{
-  "status": "error",
-  "error": "Internal server error",
-  "detail": "Error details here"
-}
-```
-
----
-
-## 🧪 Testing
-
-### Local Testing
-
-#### 1. Start the Server
-
-```bash
-uvicorn main:app --host 0.0.0.0 --port 7860
-```
-
-#### 2. Run Test Commands
-
-```bash
-# Test health check
-curl http://localhost:7860/
-
-# Test valid request
-curl -X POST http://localhost:7860/solve \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "your.email@example.com",
-    "secret": "your_secret",
-    "url": "https://tds-llm-analysis.s-anand.net/demo"
-  }'
-
-# Test invalid secret (should fail)
-curl -X POST http://localhost:7860/solve \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "your.email@example.com",
-    "secret": "wrong_secret",
-    "url": "https://tds-llm-analysis.s-anand.net/demo"
-  }'
-```
-
-#### 3. Monitor Logs
-
-Watch the server terminal for output:
-```
-BACKGROUND TASK STARTED
-Loading quiz page: https://...
-Generated answer: 42
-Submitting answer...
-QUIZ CHAIN COMPLETED
-```
-
-### Production Testing
-
-Use the included test script:
-
-```bash
-./test_production.sh
-```
-
-This runs a comprehensive test suite including:
-- ✓ Health check
-- ✓ Info endpoint
-- ✓ Valid solve request
-- ✓ Invalid secret rejection
-- ✓ Invalid email rejection
-
----
-
-## 🚢 Deployment
-
-### Docker Deployment
-
-#### Build the Image
-
-```bash
-docker build -t tds-quiz-solver .
-```
-
-#### Run the Container
-
-```bash
-docker run -d \
-  -p 7860:7860 \
-  -e EMAIL=your.email@example.com \
-  -e SECRET=your_secret \
-  -e PORT=7860 \
-  tds-quiz-solver
-```
-
-#### Test the Container
-
-```bash
-curl http://localhost:7860/
-```
-
----
-
-### Render.com (Current Production)
-
-**Live Deployment:** https://quiz-solver-15k6.onrender.com/solve
-
-#### Setup Steps
-
-1. **Push to GitHub**
-   ```bash
-   git push origin main
-   ```
-
-2. **Create New Web Service**
-   - Go to https://render.com/dashboard
-   - Click "New +" → "Blueprint"
-   - Connect your GitHub repository
-   - Select repository: `quiz-solver`
-
-3. **Configure via render.yaml**
-   - Render automatically detects `render.yaml`
-   - Service name: `tds-quiz-solver`
-   - Environment: Docker
-   - Region: Singapore (or nearest)
-   - Plan: Free
-
-4. **Add Environment Variables Manually** ⚠️
-   - **Important**: `render.yaml` env vars only apply at creation, not updates
-   - Go to Dashboard → Your Service → Environment
-   - Add manually:
-     - `EMAIL` = your.email@example.com
-     - `SECRET` = your_secret_key
-     - `PIPE_TOKEN` = (your OpenAI-compatible token)
-     - `PORT` = 7860
-     - `ENABLE_KEEP_ALIVE` = 1
-     - `DISABLE_PLAYWRIGHT` = 0
-
-5. **Deploy**
-   - Click "Manual Deploy" → "Deploy latest commit"
-   - Build takes ~5-10 minutes
-   - Monitor logs for "✓ Keep-alive ping successful"
-
-6. **Test Deployment**
-   ```bash
-   # Health check
-   curl https://quiz-solver-15k6.onrender.com/
-   
-   # Test solve endpoint
-   curl -X POST https://quiz-solver-15k6.onrender.com/solve \
-     -H "Content-Type: application/json" \
-     -d '{
-       "email": "24ds3000019@ds.study.iitm.ac.in",
-       "secret": "banana",
-       "url": "https://tds-llm-analysis.s-anand.net/demo"
-     }'
-   ```
-
-#### Keep-Alive Configuration
-
-**Important for Free Tier**: Render free tier sleeps after 15 minutes of inactivity.
-
-The app includes automatic keep-alive:
-- Self-pings every 10 minutes
-- Controlled by `ENABLE_KEEP_ALIVE=1`
-- Prevents cold starts during evaluation
-- Monitor logs: `"✓ Keep-alive ping successful"`
-
-**Optional External Monitoring**: Use [UptimeRobot](https://uptimerobot.com) (free) to ping every 5 minutes
-
----
-
-### Hugging Face Spaces (Alternative)
-
-**Note**: HF Spaces has Docker layer caching issues. Use Render.com for production.
-
-#### Quick Setup
-
-1. Create Space at https://huggingface.co/spaces
-2. Upload all files, use Docker SDK
-3. Add env vars in Settings → Variables & Secrets
-4. Use "Factory Reboot" to clear Docker cache if needed
-
----
-
-### Cloud Run / Railway / Fly.io
-
-See detailed instructions in `PROJECT_SUMMARY.md` for:
-- Google Cloud Run deployment
-- Railway quick start
-- Fly.io configuration
-
----
-
-## 🔧 Troubleshooting
-
-### Common Issues
-
-#### Port Already in Use
-
-**Check if port 7860 is in use:**
-```bash
-# macOS/Linux
-lsof -i :7860
-
-# Windows
-netstat -ano | findstr :7860
-```
-
-**Use a different port:**
-```bash
-PORT=8000 uvicorn main:app --port 8000
-```
-
----
-
-#### "playwright not found"
-
-**Solution:**
-```bash
-pip install playwright
-playwright install chromium
-```
-
-#### "ModuleNotFoundError: No module named 'pdfplumber'"
-
-**Solution:**
-```bash
-pip install -r requirements.txt
-```
-
-#### "EMAIL or SECRET not set"
-
-**Solution:**
-Create a `.env` file:
-```env
-EMAIL=your.email@example.com
-SECRET=your_secret_key
-```
-
-#### Keep-Alive Not Working
-
-**Check logs for:**
-```
-✓ Keep-alive ping successful
-```
-
-**If missing:**
-- Verify `ENABLE_KEEP_ALIVE=1` in environment
-- Check `httpx` is installed: `pip install httpx==0.27.0`
-- Ensure PORT is correctly set (7860)
-- Review logs for "Keep-alive ping failed" errors
-
-#### Quiz Times Out
-
-**Causes:**
-- Slow internet connection
-- Quiz URL not accessible
-- Complex JavaScript rendering
-
-**Solutions:**
-- Check internet connection
-- Verify quiz URL in browser
-- Increase timeout in `quiz_solver.py` (line 50)
-- Check logs for specific errors
-
-#### Playwright Browser Fails
-
-**Linux users:**
-```bash
-# Install system dependencies
-playwright install-deps
-
-# Or use fallback mode
-export DISABLE_PLAYWRIGHT=1
-```
-
-#### Docker Build Fails
-
-**Check Python version in Dockerfile:**
-```dockerfile
-FROM mcr.microsoft.com/playwright/python:v1.40.0-jammy
-```
-Should use `jammy` (Python 3.10+), not `focal` (Python 3.8)
 
 ---
 
@@ -671,105 +139,18 @@ Should use `jammy` (Python 3.10+), not `focal` (Python 3.8)
 
 ```
 quiz-solver/
-├── main.py                 # FastAPI application & endpoints (keep-alive included)
-├── quiz_solver.py          # Core quiz-solving logic (LLM + rule-based)
-├── llm_helper.py           # OpenAI GPT-4 integration for complex questions
-├── config.py               # Environment variable configuration
-├── requirements.txt        # Python dependencies (includes openai, httpx)
-├── Dockerfile              # Docker container for Render.com (port 7860)
-├── start.sh                # Startup script with diagnostics
-├── render.yaml             # Render.com deployment configuration
-├── .dockerignore           # Docker build exclusions
-├── .env.example            # Environment template
-├── .gitignore              # Git exclusions
-├── README.md               # This file (comprehensive documentation)
-├── DEPLOYMENT_FAQ.md       # Deployment troubleshooting guide
-├── EVALUATION_REPORT.md    # Testing results and capabilities
-├── LLM_INTEGRATION.md      # LLM integration documentation
-├── RENDER_SETUP_URGENT.md  # Render.com setup guide
-├── LICENSE                 # MIT License
-└── utils/                  # Utility modules (optional, for extended features)
-    ├── __init__.py
-    ├── pdf_processor.py    # PDF table extraction
-    ├── csv_processor.py    # CSV/Excel data loading
-    ├── web_scraper.py      # Web scraping utilities
-    └── data_analyzer.py    # Data analysis functions
+├── project2_solver.py      # MAIN: Project 2 Challenge Solver (21 Stages)
+├── main.py                 # MAIN: Project 1 FastAPI Webhook
+├── quiz_solver.py          # Project 1 Logic
+├── config.py               # Centralized Configuration
+├── requirements.txt        # Python Dependencies
+├── Dockerfile              # Deployment Config
+├── README.md               # Documentation
+└── solver.log              # Execution Logs
 ```
-
-### Key Files
-
-- **`main.py`**: FastAPI app, endpoints, background tasks, keep-alive mechanism, rate limiting
-- **`quiz_solver.py`**: Quiz chain solving, LLM integration, rule-based fallback, answer generation
-- **`llm_helper.py`**: OpenAI GPT-4 client for complex question parsing using PIPE_TOKEN
-- **`config.py`**: Credential validation, environment loading, PIPE_TOKEN management
-- **`start.sh`**: Diagnostic startup script checking all environment variables
-- **`utils/`**: Optional modular utility functions for file processing and analysis
 
 ---
 
 ## 📄 License
 
-This project is licensed under the **MIT License**.
-
-```
-MIT License
-
-Copyright (c) 2025 Uday Pratap
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
-
-See the [LICENSE](LICENSE) file for full details.
-
----
-
-## 📞 Contact
-
-**Project Maintainer**: Uday Pratap
-
-**GitHub Repository**: https://github.com/udayprattap/quiz-solver
-
-**Live Endpoint**: https://quiz-solver-15k6.onrender.com/solve
-
-**Email**: 24ds3000019@ds.study.iitm.ac.in
-
-### Support
-
-For issues or questions:
-1. Check [Troubleshooting](#-troubleshooting) section
-2. Review server logs for detailed error messages
-3. Verify all dependencies are installed correctly
-4. Ensure `.env` file is configured properly
-5. Test with the demo URL: `https://tds-llm-analysis.s-anand.net/demo`
-
----
-
-## 🙏 Acknowledgments
-
-Built with:
-- [FastAPI](https://fastapi.tiangolo.com/) - Modern Python web framework
-- [Playwright](https://playwright.dev/) - Browser automation
-- [pandas](https://pandas.pydata.org/) - Data manipulation
-- [pdfplumber](https://github.com/jsvine/pdfplumber) - PDF parsing
-- [matplotlib](https://matplotlib.org/) - Data visualization
-- [seaborn](https://seaborn.pydata.org/) - Statistical visualization
-
----
-
-**Happy Quiz Solving! 🚀**
+MIT License. See [LICENSE](LICENSE) for details.
