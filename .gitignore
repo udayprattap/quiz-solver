@@ -52,3 +52,8 @@ htmlcov/
 .mypy_cache/
 .dmypy.json
 dmypy.json
+# Audio files
+*.opus
+*.wav
+*.mp3
+*.m4a

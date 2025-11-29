@@ -1,0 +1,287 @@
+[
+  {
+    "url": "https://tds-llm-analysis.s-anand.net/project2",
+    "timestamp": "2025-11-29T15:29:12.430418",
+    "success": true,
+    "question_data": {
+      "full_text": "Project 2 entry\n/project2\nHow to play:\nStart by POSTing JSON to\n/submit\nwith\n{ email, secret, url, answer }\n, using\nurl\n=\n/project2\n.\nAfter each submission, the response tells you if it is correct and, if allowed, the\nnext URL\n. Open that URL in the browser to read the task-specific instructions.\nEach task page clearly states the required answer format to unlock the next URL. Difficulty 1\u20132 always reveal the next link; difficulty 3\u20135 reveal it only when correct.\nSome steps are personalized to your email (noted on the step page). Steps marked \u201cNot personalized\u201d accept the same answer for everyone.",
+      "html": "<!doctype html>\n<title>Project 2 entry</title>\n<h1>/project2</h1>\n<p>How to play:</p>\n<ul>\n  <li>Start by POSTing JSON to <code><span class=\"origin\"></span>/submit</code> with <code>{ email, secret, url, answer }</code>, using <code>url</code> = <code><span class=\"origin\"></span>/project2</code>.</li>\n  <li>After each submission, the response tells you if it is correct and, if allowed, the <strong>next URL</strong>. Open that URL in the browser to read the task-specific instructions.</li>\n  <li>Each task page clearly states the required answer format to unlock the next URL. Difficulty 1\u20132 always reveal the next link; difficulty 3\u20135 reveal it only when correct.</li>\n  <li>Some steps are personalized to your email (noted on the step page). Steps marked \u201cNot personalized\u201d accept the same answer for everyone.</li>\n</ul>\n<script type=\"module\">\nfor (const el of document.querySelectorAll('.origin')) {\n  el.textContent = window.location.origin;\n}\n</script>\n",
+      "question": "Project 2 entry\n/project2\nHow to play:\nStart by POSTing JSON to\n/submit\nwith\n{ email, secret, url, answer }\n, using\nurl\n=\n/project2\n.\nAfter each submission, the response tells you if it is correct and, if allowed, the\nnext URL\n. Open that URL in the browser to read the task-specific instructions.\nEach task page clearly states the required answer format to unlock the next URL. Difficulty 1\u20132 always reveal the next link; difficulty 3\u20135 reveal it only when correct.\nSome steps are personalized to your email (noted on the step page). Steps marked \u201cNot personalized\u201d accept the same answer for everyone.",
+      "instructions": "",
+      "is_personalized": false,
+      "difficulty": 1,
+      "url": "https://tds-llm-analysis.s-anand.net/project2"
+    },
+    "answer": "Unable to determine answer",
+    "submission": {
+      "status_code": 200,
+      "response": {
+        "correct": true,
+        "reason": "",
+        "url": "https://tds-llm-analysis.s-anand.net/project2-uv?email=24ds3000019%40ds.study.iitm.ac.in&id=45900",
+        "delay": null
+      },
+      "success": true
+    },
+    "next_url": "https://tds-llm-analysis.s-anand.net/project2-uv?email=24ds3000019%40ds.study.iitm.ac.in&id=45900"
+  },
+  {
+    "url": "https://tds-llm-analysis.s-anand.net/project2-uv?email=24ds3000019%40ds.study.iitm.ac.in&id=45900",
+    "timestamp": "2025-11-29T15:29:14.772073",
+    "success": true,
+    "question_data": {
+      "full_text": "project2-uv\n/project2-uv\nDifficulty:\n1 (next URL revealed even if wrong)\nPersonalized:\nYes (include your email in the URL).\nCraft the\ncommand string\n(not the output) using\nuv http get\non\n/project2/uv.json?email=<your email>\n.\nInclude header\nAccept: application/json\n(e.g.,\n-H \"Accept: application/json\"\n).\nPOST that exact command string as\nanswer\nwith\nurl\n=\n/project2-uv\n.",
+      "html": "<!doctype html>\n<title>project2-uv</title>\n<h1>/project2-uv</h1>\n<p><strong>Difficulty:</strong> 1 (next URL revealed even if wrong)</p>\n<p><strong>Personalized:</strong> Yes (include your email in the URL).</p>\n<ol>\n  <li>Craft the <em>command string</em> (not the output) using <code>uv http get</code> on <code><span class=\"origin\"></span>/project2/uv.json?email=&lt;your email&gt;</code>.</li>\n  <li>Include header <code>Accept: application/json</code> (e.g., <code>-H \"Accept: application/json\"</code>).</li>\n  <li>POST that exact command string as <code>answer</code> with <code>url</code> = <code><span class=\"origin\"></span>/project2-uv</code>.</li>\n</ol>\n<script type=\"module\">for (const el of document.querySelectorAll('.origin')) el.textContent = window.location.origin;</script>\n",
+      "question": "project2-uv\n/project2-uv\nDifficulty:\n1 (next URL revealed even if wrong)\nPersonalized:\nYes (include your email in the URL).\nCraft the\ncommand string\n(not the output) using\nuv http get\non\n/project2/uv.json?email=<your email>\n.\nInclude header\nAccept: application/json\n(e.g.,\n-H \"Accept: application/json\"\n).\nPOST that exact command string as\nanswer\nwith\nurl\n=\n/project2-uv\n.",
+      "instructions": "",
+      "is_personalized": true,
+      "difficulty": 1,
+      "url": "https://tds-llm-analysis.s-anand.net/project2-uv?email=24ds3000019%40ds.study.iitm.ac.in&id=45900"
+    },
+    "answer": "uv http get https://tds-llm-analysis.s-anand.net/project2/uv.json?email=24ds3000019@ds.study.iitm.ac.in -H \"Accept: application/json\"",
+    "submission": {
+      "status_code": 200,
+      "response": {
+        "correct": true,
+        "reason": "",
+        "url": "https://tds-llm-analysis.s-anand.net/project2-git?email=24ds3000019%40ds.study.iitm.ac.in&id=45917",
+        "delay": 2
+      },
+      "success": true
+    },
+    "next_url": "https://tds-llm-analysis.s-anand.net/project2-git?email=24ds3000019%40ds.study.iitm.ac.in&id=45917"
+  },
+  {
+    "url": "https://tds-llm-analysis.s-anand.net/project2-git?email=24ds3000019%40ds.study.iitm.ac.in&id=45917",
+    "timestamp": "2025-11-29T15:29:17.269976",
+    "success": true,
+    "question_data": {
+      "full_text": "project2-git\n/project2-git\nDifficulty:\n1 (next URL revealed even if wrong)\nPersonalized:\nNo.\nWrite the two shell commands to stage only\nenv.sample\nand commit with message\n\"chore: keep env sample\"\n.\nSubmit the two commands as text (newline or separator is fine) in\nanswer\nwith\nurl\n=\n/project2-git\n. Do not send command output.",
+      "html": "<!doctype html>\n<title>project2-git</title>\n<h1>/project2-git</h1>\n<p><strong>Difficulty:</strong> 1 (next URL revealed even if wrong)</p>\n<p><strong>Personalized:</strong> No.</p>\n<ol>\n  <li>Write the two shell commands to stage only <code>env.sample</code> and commit with message <code>\"chore: keep env sample\"</code>.</li>\n  <li>Submit the two commands as text (newline or separator is fine) in <code>answer</code> with <code>url</code> = <code><span class=\"origin\"></span>/project2-git</code>. Do not send command output.</li>\n</ol>\n<script type=\"module\">for (const el of document.querySelectorAll('.origin')) el.textContent = window.location.origin;</script>\n",
+      "question": "project2-git\n/project2-git\nDifficulty:\n1 (next URL revealed even if wrong)\nPersonalized:\nNo.\nWrite the two shell commands to stage only\nenv.sample\nand commit with message\n\"chore: keep env sample\"\n.\nSubmit the two commands as text (newline or separator is fine) in\nanswer\nwith\nurl\n=\n/project2-git\n. Do not send command output.",
+      "instructions": "",
+      "is_personalized": true,
+      "difficulty": 1,
+      "url": "https://tds-llm-analysis.s-anand.net/project2-git?email=24ds3000019%40ds.study.iitm.ac.in&id=45917"
+    },
+    "answer": "git add env.sample\ngit commit -m \"chore: keep env sample\"",
+    "submission": {
+      "status_code": 200,
+      "response": {
+        "correct": true,
+        "reason": "",
+        "url": "https://tds-llm-analysis.s-anand.net/project2-md?email=24ds3000019%40ds.study.iitm.ac.in&id=45931",
+        "delay": 2
+      },
+      "success": true
+    },
+    "next_url": "https://tds-llm-analysis.s-anand.net/project2-md?email=24ds3000019%40ds.study.iitm.ac.in&id=45931"
+  },
+  {
+    "url": "https://tds-llm-analysis.s-anand.net/project2-md?email=24ds3000019%40ds.study.iitm.ac.in&id=45931",
+    "timestamp": "2025-11-29T15:29:20.032223",
+    "success": true,
+    "question_data": {
+      "full_text": "project2-md\n/project2-md\nDifficulty:\n1 (next URL revealed even if wrong)\nPersonalized:\nNo.\nThe correct relative link target is exactly\n/project2/data-preparation.md\n(local copy provided).\nSubmit that exact string as\nanswer\nwith\nurl\n=\n/project2-md\n. Do\nnot\nwrap in Markdown/HTML; send the plain path only.",
+      "html": "<!doctype html>\n<title>project2-md</title>\n<h1>/project2-md</h1>\n<p><strong>Difficulty:</strong> 1 (next URL revealed even if wrong)</p>\n<p><strong>Personalized:</strong> No.</p>\n<ol>\n  <li>The correct relative link target is exactly <code>/project2/data-preparation.md</code> (local copy provided).</li>\n  <li>Submit that exact string as <code>answer</code> with <code>url</code> = <code><span class=\"origin\"></span>/project2-md</code>. Do <em>not</em> wrap in Markdown/HTML; send the plain path only.</li>\n</ol>\n<script type=\"module\">for (const el of document.querySelectorAll('.origin')) el.textContent = window.location.origin;</script>\n",
+      "question": "project2-md\n/project2-md\nDifficulty:\n1 (next URL revealed even if wrong)\nPersonalized:\nNo.\nThe correct relative link target is exactly\n/project2/data-preparation.md\n(local copy provided).\nSubmit that exact string as\nanswer\nwith\nurl\n=\n/project2-md\n. Do\nnot\nwrap in Markdown/HTML; send the plain path only.",
+      "instructions": "",
+      "is_personalized": true,
+      "difficulty": 1,
+      "url": "https://tds-llm-analysis.s-anand.net/project2-md?email=24ds3000019%40ds.study.iitm.ac.in&id=45931"
+    },
+    "answer": "/project2/data-preparation.md",
+    "submission": {
+      "status_code": 200,
+      "response": {
+        "correct": true,
+        "reason": "",
+        "url": "https://tds-llm-analysis.s-anand.net/project2-audio-passphrase?email=24ds3000019%40ds.study.iitm.ac.in&id=45948",
+        "delay": 2
+      },
+      "success": true
+    },
+    "next_url": "https://tds-llm-analysis.s-anand.net/project2-audio-passphrase?email=24ds3000019%40ds.study.iitm.ac.in&id=45948"
+  },
+  {
+    "url": "https://tds-llm-analysis.s-anand.net/project2-audio-passphrase?email=24ds3000019%40ds.study.iitm.ac.in&id=45948",
+    "timestamp": "2025-11-29T15:29:22.603370",
+    "success": true,
+    "question_data": {
+      "full_text": "project2-audio-passphrase\n/project2-audio-passphrase\nDifficulty:\n2 (next URL revealed even if wrong)\nPersonalized:\nNo.\nListen to\n/project2/audio-passphrase.opus\n.\nTranscribe the spoken phrase (words plus the 3-digit code) in lowercase, spaces allowed.\nPOST the transcription as\nanswer\nwith\nurl\n=\n/project2-audio-passphrase\n.",
+      "html": "<!doctype html>\n<title>project2-audio-passphrase</title>\n<h1>/project2-audio-passphrase</h1>\n<p><strong>Difficulty:</strong> 2 (next URL revealed even if wrong)</p>\n<p><strong>Personalized:</strong> No.</p>\n<ol>\n  <li>Listen to <a href=\"/project2/audio-passphrase.opus\">/project2/audio-passphrase.opus</a>.</li>\n  <li>Transcribe the spoken phrase (words plus the 3-digit code) in lowercase, spaces allowed.</li>\n  <li>POST the transcription as <code>answer</code> with <code>url</code> = <code><span class=\"origin\"></span>/project2-audio-passphrase</code>.</li>\n</ol>\n<script type=\"module\">for (const el of document.querySelectorAll('.origin')) el.textContent = window.location.origin;</script>\n",
+      "question": "project2-audio-passphrase\n/project2-audio-passphrase\nDifficulty:\n2 (next URL revealed even if wrong)\nPersonalized:\nNo.\nListen to\n/project2/audio-passphrase.opus\n.\nTranscribe the spoken phrase (words plus the 3-digit code) in lowercase, spaces allowed.\nPOST the transcription as\nanswer\nwith\nurl\n=\n/project2-audio-passphrase\n.",
+      "instructions": "",
+      "is_personalized": true,
+      "difficulty": 2,
+      "url": "https://tds-llm-analysis.s-anand.net/project2-audio-passphrase?email=24ds3000019%40ds.study.iitm.ac.in&id=45948"
+    },
+    "answer": "Unable to determine answer",
+    "submission": {
+      "status_code": 200,
+      "response": {
+        "correct": false,
+        "reason": "Transcribe the spoken phrase (code phrase + digits)",
+        "url": "https://tds-llm-analysis.s-anand.net/project2-heatmap?email=24ds3000019%40ds.study.iitm.ac.in&id=45970",
+        "delay": 2
+      },
+      "success": true
+    },
+    "next_url": "https://tds-llm-analysis.s-anand.net/project2-heatmap?email=24ds3000019%40ds.study.iitm.ac.in&id=45970"
+  },
+  {
+    "url": "https://tds-llm-analysis.s-anand.net/project2-heatmap?email=24ds3000019%40ds.study.iitm.ac.in&id=45970",
+    "timestamp": "2025-11-29T15:29:25.088587",
+    "success": true,
+    "question_data": {
+      "full_text": "project2-heatmap\n/project2-heatmap\nDifficulty:\n2 (next URL revealed even if wrong)\nPersonalized:\nNo.\nOpen\n/project2/heatmap.png\n.\nFind the most frequent RGB color. Return it as a hex string, e.g.,\n#rrggbb\n.\nPOST the hex string as\nanswer\nwith\nurl\n=\n/project2-heatmap\n.",
+      "html": "<!doctype html>\n<title>project2-heatmap</title>\n<h1>/project2-heatmap</h1>\n<p><strong>Difficulty:</strong> 2 (next URL revealed even if wrong)</p>\n<p><strong>Personalized:</strong> No.</p>\n<ol>\n  <li>Open <a href=\"/project2/heatmap.png\">/project2/heatmap.png</a>.</li>\n  <li>Find the most frequent RGB color. Return it as a hex string, e.g., <code>#rrggbb</code>.</li>\n  <li>POST the hex string as <code>answer</code> with <code>url</code> = <code><span class=\"origin\"></span>/project2-heatmap</code>.</li>\n</ol>\n<script type=\"module\">for (const el of document.querySelectorAll('.origin')) el.textContent = window.location.origin;</script>\n",
+      "question": "project2-heatmap\n/project2-heatmap\nDifficulty:\n2 (next URL revealed even if wrong)\nPersonalized:\nNo.\nOpen\n/project2/heatmap.png\n.\nFind the most frequent RGB color. Return it as a hex string, e.g.,\n#rrggbb\n.\nPOST the hex string as\nanswer\nwith\nurl\n=\n/project2-heatmap\n.",
+      "instructions": "",
+      "is_personalized": true,
+      "difficulty": 2,
+      "url": "https://tds-llm-analysis.s-anand.net/project2-heatmap?email=24ds3000019%40ds.study.iitm.ac.in&id=45970"
+    },
+    "answer": "#b45a1e",
+    "submission": {
+      "status_code": 200,
+      "response": {
+        "correct": true,
+        "reason": "",
+        "url": "https://tds-llm-analysis.s-anand.net/project2-csv?email=24ds3000019%40ds.study.iitm.ac.in&id=45989",
+        "delay": 2
+      },
+      "success": true
+    },
+    "next_url": "https://tds-llm-analysis.s-anand.net/project2-csv?email=24ds3000019%40ds.study.iitm.ac.in&id=45989"
+  },
+  {
+    "url": "https://tds-llm-analysis.s-anand.net/project2-csv?email=24ds3000019%40ds.study.iitm.ac.in&id=45989",
+    "timestamp": "2025-11-29T15:29:28.072541",
+    "success": true,
+    "question_data": {
+      "full_text": "project2-csv\n/project2-csv\nDifficulty:\n2 (next URL revealed even if wrong)\nPersonalized:\nNo.\nDownload\n/project2/messy.csv\n.\nNormalize to JSON: snake_case keys (\nid\n,\nname\n,\njoined\n,\nvalue\n), ISO-8601 dates, integer values, sorted by\nid\nascending.\nPOST the JSON array as a string\nanswer\nwith\nurl\n=\n/project2-csv\n.",
+      "html": "<!doctype html>\n<title>project2-csv</title>\n<h1>/project2-csv</h1>\n<p><strong>Difficulty:</strong> 2 (next URL revealed even if wrong)</p>\n<p><strong>Personalized:</strong> No.</p>\n<ol>\n  <li>Download <a href=\"/project2/messy.csv\">/project2/messy.csv</a>.</li>\n  <li>Normalize to JSON: snake_case keys (<code>id</code>, <code>name</code>, <code>joined</code>, <code>value</code>), ISO-8601 dates, integer values, sorted by <code>id</code> ascending.</li>\n  <li>POST the JSON array as a string <code>answer</code> with <code>url</code> = <code><span class=\"origin\"></span>/project2-csv</code>.</li>\n</ol>\n<script type=\"module\">for (const el of document.querySelectorAll('.origin')) el.textContent = window.location.origin;</script>\n",
+      "question": "project2-csv\n/project2-csv\nDifficulty:\n2 (next URL revealed even if wrong)\nPersonalized:\nNo.\nDownload\n/project2/messy.csv\n.\nNormalize to JSON: snake_case keys (\nid\n,\nname\n,\njoined\n,\nvalue\n), ISO-8601 dates, integer values, sorted by\nid\nascending.\nPOST the JSON array as a string\nanswer\nwith\nurl\n=\n/project2-csv\n.",
+      "instructions": "",
+      "is_personalized": true,
+      "difficulty": 2,
+      "url": "https://tds-llm-analysis.s-anand.net/project2-csv?email=24ds3000019%40ds.study.iitm.ac.in&id=45989"
+    },
+    "answer": "[{\"id\":1,\"name\":\"Alpha\",\"joined\":\"2024-01-30\",\"value\":5},{\"id\":2,\"name\":\"Gamma\",\"joined\":\"2024-02-01\",\"value\":7},{\"id\":3,\"name\":\"Beta\",\"joined\":\"2024-02-01\",\"value\":10}]",
+    "submission": {
+      "status_code": 200,
+      "response": {
+        "correct": false,
+        "reason": "Normalized JSON does not match expected output",
+        "url": "https://tds-llm-analysis.s-anand.net/project2-gh-tree?email=24ds3000019%40ds.study.iitm.ac.in&id=46012",
+        "delay": 3
+      },
+      "success": true
+    },
+    "next_url": "https://tds-llm-analysis.s-anand.net/project2-gh-tree?email=24ds3000019%40ds.study.iitm.ac.in&id=46012"
+  },
+  {
+    "url": "https://tds-llm-analysis.s-anand.net/project2-gh-tree?email=24ds3000019%40ds.study.iitm.ac.in&id=46012",
+    "timestamp": "2025-11-29T15:29:31.363457",
+    "success": true,
+    "question_data": {
+      "full_text": "project2-gh-tree\n/project2-gh-tree\nDifficulty:\n3 (next URL only on correct answer)\nPersonalized:\nYes. Add an offset based on your email length.\nUse the GitHub API:\nGET /repos/{owner}/{repo}/git/trees/{sha}?recursive=1\nwith params in\n/project2/gh-tree.json\n.\nCount how many\n.md\nfiles are under\npathPrefix\n.\nCompute\noffset = (length of your email) mod 2\n. Final answer = count + offset.\nSubmit that integer as\nanswer\nwith\nurl\n=\n/project2-gh-tree\n. Send the number only.",
+      "html": "<!doctype html>\n<title>project2-gh-tree</title>\n<h1>/project2-gh-tree</h1>\n<p><strong>Difficulty:</strong> 3 (next URL only on correct answer)</p>\n<p><strong>Personalized:</strong> Yes. Add an offset based on your email length.</p>\n<ol>\n  <li>Use the GitHub API: <code>GET /repos/{owner}/{repo}/git/trees/{sha}?recursive=1</code> with params in <a href=\"/project2/gh-tree.json\">/project2/gh-tree.json</a>.</li>\n  <li>Count how many <code>.md</code> files are under <code>pathPrefix</code>.</li>\n  <li>Compute <code>offset = (length of your email) mod 2</code>. Final answer = count + offset.</li>\n  <li>Submit that integer as <code>answer</code> with <code>url</code> = <code><span class=\"origin\"></span>/project2-gh-tree</code>. Send the number only.</li>\n</ol>\n<script type=\"module\">for (const el of document.querySelectorAll('.origin')) el.textContent = window.location.origin;</script>\n",
+      "question": "project2-gh-tree\n/project2-gh-tree\nDifficulty:\n3 (next URL only on correct answer)\nPersonalized:\nYes. Add an offset based on your email length.\nUse the GitHub API:\nGET /repos/{owner}/{repo}/git/trees/{sha}?recursive=1\nwith params in\n/project2/gh-tree.json\n.\nCount how many\n.md\nfiles are under\npathPrefix\n.\nCompute\noffset = (length of your email) mod 2\n. Final answer = count + offset.\nSubmit that integer as\nanswer\nwith\nurl\n=\n/project2-gh-tree\n. Send the number only.",
+      "instructions": "",
+      "is_personalized": true,
+      "difficulty": 3,
+      "url": "https://tds-llm-analysis.s-anand.net/project2-gh-tree?email=24ds3000019%40ds.study.iitm.ac.in&id=46012"
+    },
+    "answer": "/project2/data-preparation.md",
+    "submission": {
+      "status_code": 200,
+      "response": {
+        "correct": true,
+        "reason": "",
+        "url": "https://tds-llm-analysis.s-anand.net/project2-logs?email=24ds3000019%40ds.study.iitm.ac.in&id=46029",
+        "delay": 2
+      },
+      "success": true
+    },
+    "next_url": "https://tds-llm-analysis.s-anand.net/project2-logs?email=24ds3000019%40ds.study.iitm.ac.in&id=46029"
+  },
+  {
+    "url": "https://tds-llm-analysis.s-anand.net/project2-logs?email=24ds3000019%40ds.study.iitm.ac.in&id=46029",
+    "timestamp": "2025-11-29T15:29:33.948009",
+    "success": true,
+    "question_data": {
+      "full_text": "project2-logs\n/project2-logs\nDifficulty:\n2 (next URL revealed even if wrong)\nPersonalized:\nYes. Add an offset based on your email length.\nDownload\n/project2/logs.zip\nand sum\nbytes\nwhere\nevent==\"download\"\n.\nCompute\noffset = (length of your email) mod 5\n. Final answer = base sum + offset.\nSubmit the final integer as\nanswer\nwith\nurl\n=\n/project2-logs\n. Send the number only.",
+      "html": "<!doctype html>\n<title>project2-logs</title>\n<h1>/project2-logs</h1>\n<p><strong>Difficulty:</strong> 2 (next URL revealed even if wrong)</p>\n<p><strong>Personalized:</strong> Yes. Add an offset based on your email length.</p>\n<ol>\n  <li>Download <a href=\"/project2/logs.zip\">/project2/logs.zip</a> and sum <code>bytes</code> where <code>event==\"download\"</code>.</li>\n  <li>Compute <code>offset = (length of your email) mod 5</code>. Final answer = base sum + offset.</li>\n  <li>Submit the final integer as <code>answer</code> with <code>url</code> = <code><span class=\"origin\"></span>/project2-logs</code>. Send the number only.</li>\n</ol>\n<script type=\"module\">for (const el of document.querySelectorAll('.origin')) el.textContent = window.location.origin;</script>\n",
+      "question": "project2-logs\n/project2-logs\nDifficulty:\n2 (next URL revealed even if wrong)\nPersonalized:\nYes. Add an offset based on your email length.\nDownload\n/project2/logs.zip\nand sum\nbytes\nwhere\nevent==\"download\"\n.\nCompute\noffset = (length of your email) mod 5\n. Final answer = base sum + offset.\nSubmit the final integer as\nanswer\nwith\nurl\n=\n/project2-logs\n. Send the number only.",
+      "instructions": "",
+      "is_personalized": true,
+      "difficulty": 2,
+      "url": "https://tds-llm-analysis.s-anand.net/project2-logs?email=24ds3000019%40ds.study.iitm.ac.in&id=46029"
+    },
+    "answer": "336",
+    "submission": {
+      "status_code": 200,
+      "response": {
+        "correct": true,
+        "reason": "",
+        "url": "https://tds-llm-analysis.s-anand.net/project2-invoice?email=24ds3000019%40ds.study.iitm.ac.in&id=46039",
+        "delay": 3
+      },
+      "success": true
+    },
+    "next_url": "https://tds-llm-analysis.s-anand.net/project2-invoice?email=24ds3000019%40ds.study.iitm.ac.in&id=46039"
+  },
+  {
+    "url": "https://tds-llm-analysis.s-anand.net/project2-invoice?email=24ds3000019%40ds.study.iitm.ac.in&id=46039",
+    "timestamp": "2025-11-29T15:29:37.025155",
+    "success": true,
+    "question_data": {
+      "full_text": "project2-invoice\n/project2-invoice\nDifficulty:\n3 (next URL only on correct answer)\nPersonalized:\nNo.\nOpen\n/project2/invoice.pdf\n.\nCompute\nsum(Quantity * UnitPrice)\nacross line items.\nPOST the total rounded to 2 decimals as\nanswer\nwith\nurl\n=\n/project2-invoice\n.",
+      "html": "<!doctype html>\n<title>project2-invoice</title>\n<h1>/project2-invoice</h1>\n<p><strong>Difficulty:</strong> 3 (next URL only on correct answer)</p>\n<p><strong>Personalized:</strong> No.</p>\n<ol>\n  <li>Open <a href=\"/project2/invoice.pdf\">/project2/invoice.pdf</a>.</li>\n  <li>Compute <code>sum(Quantity * UnitPrice)</code> across line items.</li>\n  <li>POST the total rounded to 2 decimals as <code>answer</code> with <code>url</code> = <code><span class=\"origin\"></span>/project2-invoice</code>.</li>\n</ol>\n<script type=\"module\">for (const el of document.querySelectorAll('.origin')) el.textContent = window.location.origin;</script>\n",
+      "question": "project2-invoice\n/project2-invoice\nDifficulty:\n3 (next URL only on correct answer)\nPersonalized:\nNo.\nOpen\n/project2/invoice.pdf\n.\nCompute\nsum(Quantity * UnitPrice)\nacross line items.\nPOST the total rounded to 2 decimals as\nanswer\nwith\nurl\n=\n/project2-invoice\n.",
+      "instructions": "",
+      "is_personalized": true,
+      "difficulty": 3,
+      "url": "https://tds-llm-analysis.s-anand.net/project2-invoice?email=24ds3000019%40ds.study.iitm.ac.in&id=46039"
+    },
+    "answer": "170.97",
+    "submission": {
+      "status_code": 200,
+      "response": {
+        "correct": true,
+        "reason": "",
+        "url": "https://tds-llm-analysis.s-anand.net/project2-orders?email=24ds3000019%40ds.study.iitm.ac.in&id=46056",
+        "delay": 2
+      },
+      "success": true
+    },
+    "next_url": "https://tds-llm-analysis.s-anand.net/project2-orders?email=24ds3000019%40ds.study.iitm.ac.in&id=46056"
+  },
+  {
+    "url": "https://tds-llm-analysis.s-anand.net/project2-orders?email=24ds3000019%40ds.study.iitm.ac.in&id=46056",
+    "timestamp": "2025-11-29T15:29:40.022183",
+    "success": true,
+    "question_data": {
+      "full_text": "project2-orders\n/project2-orders\nDifficulty:\n3 (next URL only on correct answer)\nPersonalized:\nNo.\nDownload\n/project2/orders.csv\n.\nCompute running totals by\ncustomer_id\nin order of\norder_date\n, then take the top 3 customers by total (highest first).\nPOST a JSON array of objects\n{\"customer_id\": \"...\", \"total\": number}\nfor those top 3, in rank order, with\nurl\n=\n/project2-orders\n.",
+      "html": "<!doctype html>\n<title>project2-orders</title>\n<h1>/project2-orders</h1>\n<p><strong>Difficulty:</strong> 3 (next URL only on correct answer)</p>\n<p><strong>Personalized:</strong> No.</p>\n<ol>\n  <li>Download <a href=\"/project2/orders.csv\">/project2/orders.csv</a>.</li>\n  <li>Compute running totals by <code>customer_id</code> in order of <code>order_date</code>, then take the top 3 customers by total (highest first).</li>\n  <li>POST a JSON array of objects <code>{\"customer_id\": \"...\", \"total\": number}</code> for those top 3, in rank order, with <code>url</code> = <code><span class=\"origin\"></span>/project2-orders</code>.</li>\n</ol>\n<script type=\"module\">for (const el of document.querySelectorAll('.origin')) el.textContent = window.location.origin;</script>\n",
+      "question": "project2-orders\n/project2-orders\nDifficulty:\n3 (next URL only on correct answer)\nPersonalized:\nNo.\nDownload\n/project2/orders.csv\n.\nCompute running totals by\ncustomer_id\nin order of\norder_date\n, then take the top 3 customers by total (highest first).\nPOST a JSON array of objects\n{\"customer_id\": \"...\", \"total\": number}\nfor those top 3, in rank order, with\nurl\n=\n/project2-orders\n.",
+      "instructions": "",
+      "is_personalized": true,
+      "difficulty": 3,
+      "url": "https://tds-llm-analysis.s-anand.net/project2-orders?email=24ds3000019%40ds.study.iitm.ac.in&id=46056"
+    },
+    "answer": "[{\"id\":1,\"name\":\"Alpha\",\"joined\":\"2024-01-30\",\"value\":5},{\"id\":2,\"name\":\"Gamma\",\"joined\":\"2024-02-01\",\"value\":7},{\"id\":3,\"name\":\"Beta\",\"joined\":\"2024-02-01\",\"value\":10}]",
+    "submission": {
+      "status_code": 200,
+      "response": {
+        "correct": false,
+        "reason": "Provide customer_id and numeric total",
+        "url": null,
+        "delay": 2
+      },
+      "success": true
+    }
+  }
+]
