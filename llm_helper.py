@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 # Check if openai is available
 try:
-    import openai
+    from openai import AsyncOpenAI
     OPENAI_AVAILABLE = True
 except ImportError:
     OPENAI_AVAILABLE = False
@@ -39,11 +39,14 @@ class LLMQuestionAnalyzer:
         """
         self.api_token = api_token or os.getenv("PIPE_TOKEN")
         self.enabled = bool(self.api_token and OPENAI_AVAILABLE)
+        self.client = None
         
         if self.enabled:
-            # Configure OpenAI client with custom base URL if needed
-            # IITM's PIPE service might use a custom endpoint
-            openai.api_key = self.api_token
+            # Configure OpenAI client
+            self.client = AsyncOpenAI(
+                api_key=self.api_token,
+                base_url="https://api.openai.com/v1" # Default, can be overridden if needed
+            )
             logger.info("✅ LLM integration enabled with PIPE_TOKEN")
         else:
             if not self.api_token:
@@ -59,24 +62,8 @@ class LLMQuestionAnalyzer:
     ) -> Dict[str, Any]:
         """
         Analyze question using LLM to understand intent and generate solution approach
-        
-        Args:
-            question_text: The quiz question text
-            available_data: Dict with keys: 'dataframe', 'columns', 'shape', 'data_source'
-            html_content: Optional HTML content from page
-            
-        Returns:
-            Dict with:
-                - operation: Type of operation (sum, count, filter, etc.)
-                - column: Target column name
-                - filter_condition: Optional filter to apply
-                - aggregation: Aggregation function if needed
-                - chart_type: Chart type if visualization needed
-                - confidence: Confidence score (0-1)
-                - fallback_used: Boolean indicating if fallback was used
         """
-        
-        if not self.enabled:
+        if not self.enabled or not self.client:
             return {"fallback_used": True, "confidence": 0.5}
         
         try:
@@ -162,8 +149,8 @@ Respond ONLY with valid JSON, no other text.
         """
         try:
             # Use chat completions API (GPT-3.5/GPT-4)
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",  # or "gpt-4" if available
+            response = await self.client.chat.completions.create(
+                model="gpt-4o-mini",  # Use a cost-effective model
                 messages=[
                     {
                         "role": "system",

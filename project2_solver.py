@@ -29,6 +29,7 @@ except ImportError:
     HAS_SPEECH_RECOGNITION = False
 
 from config import EMAIL, SECRET, PIPE_TOKEN
+from llm_helper import get_llm_analyzer
 
 # Configure logging
 logging.basicConfig(
@@ -50,6 +51,7 @@ class Project2Solver:
         self.base_url = "https://tds-llm-analysis.s-anand.net"
         self.submit_url = f"{self.base_url}/submit"
         self.results: List[Dict[str, Any]] = []
+        self.llm_analyzer = get_llm_analyzer()
         
         if not self.email or not self.secret:
             logger.warning("EMAIL or SECRET not set in environment variables!")
@@ -108,6 +110,8 @@ class Project2Solver:
                 elif response.get('correct'):
                     logger.info("Stage correct! (No next URL, possibly final stage)")
                     result['success'] = True
+            else:
+                logger.error(f"Submission failed: {submission.get('response')}")
             
             return result
             
@@ -121,6 +125,11 @@ class Project2Solver:
         text = data['full_text'].lower()
         url = data['url']
         
+        # Stage 1: Start page
+        if 'how to play' in text and 'start by posting' in text:
+            logger.info("Detected start page, submitting email as answer")
+            return self.email
+
         # Stage 2: uv command
         if 'uv http get' in text: return await self._solve_uv_command(data)
         # Stage 3: git commands
@@ -162,8 +171,8 @@ class Project2Solver:
         # Stage 21: F1
         if 'f1.json' in text: return await self._solve_macro_f1(data)
         
-        logger.warning("Unknown stage type, returning empty string")
-        return ""
+        logger.warning("Unknown stage type, attempting LLM fallback")
+        return await self._solve_with_llm(data)
 
     # --- Solvers ---
 
@@ -340,6 +349,40 @@ class Project2Solver:
                 macro = sum(f1s) / len(f1s)
                 if macro > best_f1: best_f1, best_run = macro, run['run_id']
             return json.dumps({"run_id": best_run, "macro_f1": round(best_f1, 4)})
+
+    async def _solve_with_llm(self, data: Dict[str, Any]) -> str:
+        """Fallback to LLM for unknown stages"""
+        if not self.llm_analyzer.enabled:
+            return ""
+            
+        context = f"""
+Solve this task and provide ONLY the exact answer required:
+
+{data['full_text']}
+
+Requirements:
+- Read the task carefully
+- Provide ONLY the answer in the exact format requested
+- Do NOT include explanations or extra text
+- If the task asks to start, the answer might be the email address or "start"
+- If the task asks for a command, provide the command
+- If the task asks for a number, provide the number
+
+Answer:"""
+        
+        try:
+            response = await self.llm_analyzer.client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "system", "content": "You are a helpful assistant. Provide ONLY the answer."},
+                    {"role": "user", "content": context}
+                ],
+                max_tokens=100
+            )
+            return response.choices[0].message.content.strip()
+        except Exception as e:
+            logger.error(f"LLM fallback failed: {e}")
+            return ""
 
     async def submit_answer(self, url: str, answer: str) -> Dict[str, Any]:
         """Submit answer to endpoint"""
